@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "jobbot-dashboard",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "jobbot", "web"],
+      "port": 8765
+    },
+    {
+      "name": "jobbot-demo",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "jobbot", "--demo", "web", "--port", "8766"],
+      "port": 8766
+    }
+  ]
+}
