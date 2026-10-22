@@ -1,0 +1,151 @@
+{
+ "apiVersion": "1",
+ "jobs": [
+  {
+   "id": "efe55756-f28b-4030-b9a0-539f6c8ed8ff",
+   "title": "Engineering Manager, Platform",
+   "department": "Engineering",
+   "team": "Engineering",
+   "employmentType": "FullTime",
+   "location": "San Francisco",
+   "shouldDisplayCompensationOnJobPostings": true,
+   "secondaryLocations": [],
+   "publishedAt": "2026-10-12T20:53:19.718+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "California",
+     "addressCountry": "United States",
+     "addressLocality": "San Francisco"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/airbyte/efe55756-f28b-4030-b9a0-539f6c8ed8ff",
+   "applyUrl": "https://jobs.ashbyhq.com/airbyte/efe55756-f28b-4030-b9a0-539f6c8ed8ff/application",
+   "descriptionHtml": "<p style=\"min-height:1.5em\">Airbyte is the data and action layer for AI agents. We give agents fast, accurate, authenticated access to business data across hundreds of sources, so they can discover the entities that matter, reason over real-time context, and take action in the systems they read from, not just observe them.</p><p style=\"min-height:1.5em\"></p><p style=\"min-height:1.5em\">We started as the open-source standard for data movement and proved the economics of data integration at scale: hundreds of connectors, thousands of companies, and, since 2020, have raised $181M from leading inve",
+   "descriptionPlain": "Airbyte is the data and action layer for AI agents. We give agents fast, accurate, authenticated access to business data across hundreds of sources, so they can discover the entities that matter, reason over real-time context, and take action in the systems they read from, not just observe them.\n\n\n\nWe started as the open-source standard for data movement and proved the economics of data integration at scale: hundreds of connectors, thousands of companies, and, since 2020, have raised $181M from leading investors including Benchmark, Accel, Altimeter, Coatue, and Y Combinator. As our CEO Michel Tricot puts it, \"the last ten years were all about structured data. The future is all about context.\" We're now building that context infrastructure for production-grade agents on the same open foundation, as agents become the primary consumers of enterprise data.\n\n\n\nOur mission is unchanged: make data available and actionable to everyone, everywhere. That everyone now includes AI agents.\n\n\n\n\nTHE",
+   "compensation": {
+    "compensationTierSummary": "$217K – $260K • Offers Equity",
+    "scrapeableCompensationSalarySummary": "$217K - $260K",
+    "compensationTiers": [
+     {
+      "id": "e36f84b0-da57-4a33-bd3d-ba9d3924a3dc",
+      "tierSummary": "$217K – $260K • Offers Equity",
+      "title": null,
+      "additionalInformation": null,
+      "components": [
+       {
+        "id": "8622b89e-97ed-4bec-b3b3-21cf8b39fcef",
+        "summary": "Offers Equity",
+        "compensationType": "EquityPercentage",
+        "interval": "NONE",
+        "currencyCode": null,
+        "minValue": null,
+        "maxValue": null
+       },
+       {
+        "id": "1c40c806-83fe-44d0-ac59-3fbc13ec9491",
+        "summary": "$217K – $260K",
+        "compensationType": "Salary",
+        "interval": "1 YEAR",
+        "currencyCode": "USD",
+        "minValue": 217000,
+        "maxValue": 260000
+       }
+      ]
+     }
+    ],
+    "summaryComponents": [
+     {
+      "compensationType": "EquityPercentage",
+      "interval": "NONE",
+      "currencyCode": null,
+      "minValue": null,
+      "maxValue": null
+     },
+     {
+      "compensationType": "Salary",
+      "interval": "1 YEAR",
+      "currencyCode": "USD",
+      "minValue": 217000,
+      "maxValue": 260000
+     }
+    ]
+   }
+  },
+  {
+   "id": "b59bbc91-fb77-4a08-9c47-0fca7f755942",
+   "title": "Senior Backend Engineer, Agent Infrastructure",
+   "department": "Engineering",
+   "team": "Engineering",
+   "employmentType": "FullTime",
+   "location": "San Francisco",
+   "shouldDisplayCompensationOnJobPostings": true,
+   "secondaryLocations": [],
+   "publishedAt": "2026-10-12T20:53:02.796+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressRegion": "California",
+     "addressCountry": "United States",
+     "addressLocality": "San Francisco"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/airbyte/b59bbc91-fb77-4a08-9c47-0fca7f755942",
+   "applyUrl": "https://jobs.ashbyhq.com/airbyte/b59bbc91-fb77-4a08-9c47-0fca7f755942/application",
+   "descriptionHtml": "<p style=\"min-height:1.5em\">Airbyte is the data and action layer for AI agents. We give agents fast, accurate, authenticated access to business data across hundreds of sources, so they can discover the entities that matter, reason over real-time context, and take action in the systems they read from, not just observe them.</p><p style=\"min-height:1.5em\"></p><p style=\"min-height:1.5em\">We started as the open-source standard for data movement and proved the economics of data integration at scale: hundreds of connectors, thousands of companies, and, since 2020, have raised $181M from leading inve",
+   "descriptionPlain": "Airbyte is the data and action layer for AI agents. We give agents fast, accurate, authenticated access to business data across hundreds of sources, so they can discover the entities that matter, reason over real-time context, and take action in the systems they read from, not just observe them.\n\n\n\nWe started as the open-source standard for data movement and proved the economics of data integration at scale: hundreds of connectors, thousands of companies, and, since 2020, have raised $181M from leading investors including Benchmark, Accel, Altimeter, Coatue, and Y Combinator. As our CEO Michel Tricot puts it, \"the last ten years were all about structured data. The future is all about context.\" We're now building that context infrastructure for production-grade agents on the same open foundation, as agents become the primary consumers of enterprise data.\n\n\n\nOur mission is unchanged: make data available and actionable to everyone, everywhere. That everyone now includes AI agents.\n\n\n\n\n\n\n\n",
+   "compensation": {
+    "compensationTierSummary": "$196K – $235K • Offers Equity",
+    "scrapeableCompensationSalarySummary": "$196K - $235K",
+    "compensationTiers": [
+     {
+      "id": "fb558afa-1add-4d2f-900c-aab1b1957e06",
+      "tierSummary": "$196K – $235K • Offers Equity",
+      "title": null,
+      "additionalInformation": null,
+      "components": [
+       {
+        "id": "664aecef-b406-437e-a8f3-7fd0e9cc1f4f",
+        "summary": "Offers Equity",
+        "compensationType": "EquityPercentage",
+        "interval": "NONE",
+        "currencyCode": null,
+        "minValue": null,
+        "maxValue": null
+       },
+       {
+        "id": "72194d7d-b1c6-4358-984e-30d83df834ed",
+        "summary": "$196K – $235K",
+        "compensationType": "Salary",
+        "interval": "1 YEAR",
+        "currencyCode": "USD",
+        "minValue": 196000,
+        "maxValue": 235000
+       }
+      ]
+     }
+    ],
+    "summaryComponents": [
+     {
+      "compensationType": "EquityPercentage",
+      "interval": "NONE",
+      "currencyCode": null,
+      "minValue": null,
+      "maxValue": null
+     },
+     {
+      "compensationType": "Salary",
+      "interval": "1 YEAR",
+      "currencyCode": "USD",
+      "minValue": 196000,
+      "maxValue": 235000
+     }
+    ]
+   }
+  }
+ ]
+}
