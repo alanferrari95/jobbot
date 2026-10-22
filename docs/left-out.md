@@ -14,4 +14,4 @@ by default and only lists what is public, so none of the following can be commit
 | The screening test set (`verify_testset.yaml`) | It lists the real jobs I applied to and rejected. `jobbot verify-test` runs against your own. |
 | Real postings in the demo | The demo uses fictional companies on `example.com`; only the parser tests use trimmed real API responses. |
 | My local job sources (`profile/local_sources.py`) | One of them scrapes a job board's HTML, which its terms don't allow; it is not part of the public code. |
-| A headless drafter (LLM API) | Tailoring happens in an interactive Claude Code session I supervise. An unattended drafter would need its own guardrails and is not built. |
+| API keys and model weights | `jobbot draft` can use Gemini, Ollama or any OpenAI-compatible server, but you bring the key or the GPU. The default drafter needs neither. |

@@ -7,6 +7,7 @@ import concurrent.futures as cf
 import importlib.util
 import json
 import re
+import sys
 from datetime import datetime, timedelta
 
 import yaml
@@ -264,12 +265,22 @@ def verify_candidates(min_score: float | None = None, limit: int = 40, log=print
 
 
 def prepare_all() -> list[str]:
-    """Pack every VERIFIED new job that fits well enough to apply (no fixed limit) and queue its CV tailoring."""
+    """Pack every VERIFIED new job that fits well enough to apply (no fixed limit) and queue its CV tailoring.
+    With targets.yaml `auto_draft: true`, `jobbot draft` (backend: targets.yaml `drafter`, default local) also
+    writes, renders and verifies a first CV."""
     con = db.connect()
-    min_score = targets().get("auto_apply_min_score", 6)
+    tg = targets()
     rows = con.execute("SELECT id FROM jobs WHERE status = 'new' AND score >= ? AND verdict = 'verified' "
-                       "ORDER BY score DESC", (min_score,)).fetchall()
-    return [pack(r["id"]) for r in rows]
+                       "ORDER BY score DESC", (tg.get("auto_apply_min_score", 6),)).fetchall()
+    ids = [pack(r["id"]) for r in rows]
+    if tg.get("auto_draft"):
+        from .drafter import draft
+        for jid in ids:
+            try:
+                draft(jid, log=lambda m: print(m, file=sys.stderr))
+            except (Exception, SystemExit) as e:  # an edited spec or a PDF error must not stop the daily run
+                print(f"  ! draft {jid}: {e}", file=sys.stderr)
+    return ids
 
 
 def fit_guard(job_id: str) -> bool:

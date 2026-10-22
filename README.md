@@ -18,7 +18,7 @@ flowchart LR
     A["discover<br/>ATS boards + job boards<br/>(public APIs, 2x/day)"] --> B["rank<br/>hard filters +<br/>local embeddings"]
     B --> S["screen<br/>company page +<br/>application form"]
     S --> C["pack<br/>applications/&lt;id&gt;/"]
-    C --> D["tailor (agent)<br/>drafter → reviewer<br/>Claude Code skill"]
+    C --> D["tailor<br/>Claude Code skill (drafter → reviewer)<br/>or jobbot draft: local / your LLM"]
     D --> E{"verify<br/>grounding gate<br/>(deterministic)"}
     E -- FAIL --> D
     E -- PASS --> F["prefill<br/>Playwright, stops<br/>before Submit"]
@@ -31,7 +31,7 @@ flowchart LR
 | rank | Hard filters first (title, seniority, location/eligibility, languages, salary floor, required tech I never used), then a 0–10 score: CV fit = how much of the posting my real bullets cover, with a multilingual sentence-embedding model run locally (ONNX via fastembed, no API), embeddings cached in SQLite. | [match.py](jobbot/match.py), [semantic.py](jobbot/semantic.py) |
 | screen | For the best ones: find the posting on the company's own board, check it is open and where it really is, and read the form's required questions (citizenship, currency, work authorization). Measured against my real accept/reject decisions with `jobbot verify-test`. | [screening.py](jobbot/screening.py), [formgate.py](jobbot/formgate.py) |
 | pack | One folder per job with the posting and a tailoring spec that starts as the full base CV. | [pipeline.py](jobbot/pipeline.py) |
-| tailor | Claude Code follows a written playbook: a **drafter** reorders bullet ids and rewrites title, summary and answers; an independent **reviewer** pass reads it as the hiring manager. | [.claude/skills/tailor-cv/SKILL.md](.claude/skills/tailor-cv/SKILL.md) |
+| tailor | Claude Code follows a written playbook: a **drafter** reorders bullet ids and rewrites title, summary and answers; an independent **reviewer** pass reads it as the hiring manager. Without an agent session, `jobbot draft` does it with the backend you choose (below). | [.claude/skills/tailor-cv/SKILL.md](.claude/skills/tailor-cv/SKILL.md), [drafter.py](jobbot/drafter.py) |
 | verify | The grounding gate (below). | [grounding.py](jobbot/grounding.py) |
 | prefill | Opens the original form in Chrome, uploads the CV, fills every question it has a grounded answer for, declines EEO questions, outlines the Submit button in red and waits. | [autofill.py](jobbot/autofill.py) |
 
@@ -87,8 +87,8 @@ wording, which is what the reviewer pass and my own read are for.
 - **Respect the sources' terms.** Job data comes only from public APIs and feeds (ATS posting APIs, job-board
   APIs and RSS), with a descriptive User-Agent, backoff on 429/5xx and links back to the source. No HTML scraping
   in this repo; anything you add locally (`profile/local_sources.py`) is your call and stays out of it.
-- **Local first.** Embeddings run on your machine, data stays in a local SQLite file, the dashboard binds to
-  127.0.0.1. No API keys are needed.
+- **Local first, bring your own model.** Embeddings run on your machine, data stays in a local SQLite file, the
+  dashboard binds to 127.0.0.1. Nothing needs an API key; an LLM drafter is opt-in, with your key or your GPU.
 
 ## Run it
 
@@ -104,7 +104,8 @@ pip install -e ".[dev]"
 embedding model and PDF renderer are swapped for offline stand-ins, so scores are only illustrative):
 
 ```bash
-jobbot demo                 # discover -> rank -> pack -> replayed agent output -> verify (one PASS, one FAIL)
+jobbot demo                 # discover -> rank -> pack -> replayed agent output -> verify (one PASS, one FAIL),
+                            # then a local `jobbot draft` (no LLM) that passes the gate
 jobbot --demo list
 jobbot --demo web           # dashboard on http://127.0.0.1:8766 with the demo data
 ```
@@ -117,6 +118,20 @@ jobbot --demo web           # dashboard on http://127.0.0.1:8766 with the demo d
 4. `jobbot verify <id>`, then `jobbot apply <id>`: Chrome opens with the form filled in; review and submit.
 5. Optional: `jobbot daily` twice a day ([Windows and cron instructions](docs/scheduling.md)) and `jobbot web`.
 
+**Tailoring without an agent session**: `jobbot draft <id>` writes the tailoring spec, renders it and runs the gate.
+Pick what runs it:
+
+| `--drafter` | Needs | What it does |
+|---|---|---|
+| `local` (default) | nothing | Deterministic, no LLM: orders each role's bullets by how much of the posting they cover (local embeddings) and puts the skills the posting names first. Title and summary stay as in your profile. |
+| `gemini` | your `GEMINI_API_KEY` | Gemini through Google's OpenAI-compatible endpoint rewrites title and summary and picks bullets and skills. |
+| `ollama` | your GPU (or CPU) and [Ollama](https://ollama.com) | The same, with a local model (`JOBBOT_LLM_MODEL`, default `llama3.1:8b`). |
+| `openai-compatible` | `JOBBOT_LLM_BASE_URL`, `JOBBOT_LLM_MODEL`, maybe `JOBBOT_LLM_API_KEY` | Any `/v1/chat/completions` server: vLLM, LM Studio, a hosted API. |
+
+With an LLM backend, the gate's errors are sent back to the model for a corrected answer (up to 3 tries), and the
+result still has to pass `jobbot verify` before you can apply. Set `drafter:` and `auto_draft: true` in
+`targets.yaml` to draft every job that `jobbot daily` prepares.
+
 Data goes to `applications/`, `cv/` and `logs/` next to the code (or `--home DIR` / `JOBBOT_HOME`); none of it is
 committed. Run `pytest` and `ruff check .` for the checks CI runs.
 
@@ -125,7 +140,7 @@ committed. Run `pytest` and `ruff check .` for the checks CI runs.
 | CV bullet | Files | Evidence |
 |---|---|---|
 | Pulls postings twice a day from 112 company ATS boards (Greenhouse, Lever, Ashby) and job boards, and ranks them against my profile with local multilingual sentence embeddings (ONNX, cached in SQLite). | [sources.py](jobbot/sources.py) (`greenhouse`, `lever`, `ashby`, `BOARDS`), [examples/profile/companies.yaml](examples/profile/companies.yaml) (the 112 boards), [scripts/run_daily.*](scripts/) + [docs/scheduling.md](docs/scheduling.md) (09:00 and 19:00), [semantic.py](jobbot/semantic.py) (`paraphrase-multilingual-MiniLM-L12-v2` through fastembed/ONNX, `emb` table), [match.py](jobbot/match.py) (`evaluate_many`) | [test_sources.py](tests/test_sources.py) (parsers on recorded Greenhouse, Lever and Ashby responses), [test_semantic.py](tests/test_semantic.py) (model mocked: chunking, cache, CV fit), [test_match.py](tests/test_match.py) |
-| A coding agent (Claude Code) tailors each CV and form answer from a single source-of-truth profile, following a written playbook with a drafter–reviewer pass. | [.claude/skills/tailor-cv/SKILL.md](.claude/skills/tailor-cv/SKILL.md) (drafter → reviewer → gate), [examples/profile/base_cv.yaml](examples/profile/base_cv.yaml), [pipeline.py](jobbot/pipeline.py) (`pack`, `spec_template`, task queue), [cv.py](jobbot/cv.py) (`resolve`) | [examples/demo/agent_output/](examples/demo/agent_output/) (a grounded and a hallucinated output), [test_resolve.py](tests/test_resolve.py), `jobbot demo` |
+| A coding agent (Claude Code) tailors each CV and form answer from a single source-of-truth profile, following a written playbook with a drafter–reviewer pass. | [.claude/skills/tailor-cv/SKILL.md](.claude/skills/tailor-cv/SKILL.md) (drafter → reviewer → gate), [examples/profile/base_cv.yaml](examples/profile/base_cv.yaml), [pipeline.py](jobbot/pipeline.py) (`pack`, `spec_template`, task queue), [cv.py](jobbot/cv.py) (`resolve`), [drafter.py](jobbot/drafter.py) (the same loop without an agent session) | [examples/demo/agent_output/](examples/demo/agent_output/) (a grounded and a hallucinated output), [test_resolve.py](tests/test_resolve.py), [test_drafter.py](tests/test_drafter.py), `jobbot demo` |
 | Verification outside the model: a deterministic checker blocks any claim, number or technology not in the profile; Playwright prefills the form and stops before Submit for human approval. | [grounding.py](jobbot/grounding.py), [autofill.py](jobbot/autofill.py) (no code path clicks Submit), [__main__.py](jobbot/__main__.py) and [web.py](jobbot/web.py) (`apply` refuses to run unless verify passes) | [test_grounding.py](tests/test_grounding.py), [test_demo_and_web.py](tests/test_demo_and_web.py), CI |
 
 ## Repository layout
@@ -150,7 +165,8 @@ POSTING.md              rules for the LinkedIn post drafts the agent writes (you
 - The screening layer's metrics come from the same decisions its rules were written from (in-sample).
 - Autofill is tuned for Greenhouse, Ashby and Get on Board forms. Lever's form rejects submissions from an
   automated browser, so apply to Lever postings by hand. Workday and other ATSs without public APIs are skipped.
-- Tailoring needs an interactive Claude Code session: there is no headless drafter.
+- The local drafter only selects and orders; the wording (title, summary, answers) needs the agent or an LLM backend.
+  The LLM backends are tested against a mocked model, not benchmarked.
 - Windows is the main platform (Word for PDFs, Task Scheduler); LibreOffice and cron work, and CI runs on Linux.
 
 ## License

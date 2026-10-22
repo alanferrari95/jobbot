@@ -8,6 +8,8 @@ Usage (from the repo root; `jobbot ...` works the same after `pip install -e .`)
   python -m jobbot list [--status new] [--min-score 6] [--limit 30]
   python -m jobbot show <id>
   python -m jobbot pack <id>                 create applications/<id>/ and queue CV tailoring for the agent
+  python -m jobbot draft <id> [--drafter local|gemini|ollama|openai-compatible] [--force]
+                                             tailor without an agent session, then render + verify
   python -m jobbot render <id>|base
   python -m jobbot verify <id>               the grounding gate (exit code 1 on FAIL)
   python -m jobbot apply <id>                open the form, prefill, you click Submit
@@ -96,6 +98,15 @@ def cmd_show(args) -> None:
 def cmd_pack(args) -> None:
     jid = pipeline.pack(args.id)
     print(f"Packed {app_dir(jid)}\nNext: ask Claude Code to \"tailor the CV for {jid}\" (or to process the task queue).")
+
+
+def cmd_draft(args) -> bool:
+    from .drafter import draft
+
+    jid, result, note = draft(args.id, backend=args.drafter, force=args.force)
+    print(f"Drafted {app_dir(jid) / 'cv.yaml'} ({note})")
+    print(report_md(jid, result))
+    return result["ok"]
 
 
 def cmd_render(args) -> None:
@@ -236,6 +247,10 @@ def main() -> None:
     s.add_argument("--limit", type=int, default=30); s.set_defaults(f=cmd_list)
     for name, f in [("show", cmd_show), ("pack", cmd_pack), ("render", cmd_render), ("verify", cmd_verify)]:
         s = sub.add_parser(name); s.add_argument("id"); s.set_defaults(f=f)
+    s = sub.add_parser("draft"); s.add_argument("id"); s.add_argument("--force", action="store_true")
+    s.add_argument("--drafter", choices=["local", "gemini", "ollama", "openai-compatible"],
+                   help="default: $JOBBOT_DRAFTER, targets.yaml `drafter`, else local (no LLM)")
+    s.set_defaults(f=cmd_draft)
     s = sub.add_parser("apply"); s.add_argument("id"); s.add_argument("--from-web", action="store_true")
     s.set_defaults(f=cmd_apply)
     sub.add_parser("prepare-all").set_defaults(f=cmd_prepare_all)

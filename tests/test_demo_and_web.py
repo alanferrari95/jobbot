@@ -30,6 +30,7 @@ def test_demo_runs_the_whole_loop(demo_home):
     assert statuses["greenhouse-northwind-ai-4001001"] == "ready"      # passed the gate
     assert statuses["lever-contoso-labs-c0a1e5d2-0001"] == "packed"    # failed it: never becomes ready
     assert statuses["ashby-fabrikam-health-f4b1-0001"] == "applied"
+    assert statuses["ashby-fabrikam-health-f4b1-0004"] == "ready"      # drafted locally, no LLM, passed the gate
 
 
 def test_demo_refuses_to_write_outside_a_demo_folder(isolated):
@@ -44,10 +45,10 @@ def test_dashboard_api(demo_home):
     client = TestClient(app)
     assert "<title>jobbot</title>" in client.get("/").text
     summary = client.get("/api/summary").json()
-    assert summary["jobs"]["ready"] == 1 and summary["jobs"]["applied"] == 1
+    assert summary["jobs"]["ready"] == 2 and summary["jobs"]["applied"] == 1
     assert len(summary["needs_confirm"]) == 2  # salary and start date wait for the candidate
     jobs = client.get("/api/jobs", params={"status": "ready"}).json()
-    assert [j["id"] for j in jobs] == ["greenhouse-northwind-ai-4001001"]
+    assert {j["id"] for j in jobs} == {"greenhouse-northwind-ai-4001001", "ashby-fabrikam-health-f4b1-0004"}
     detail = client.get("/api/jobs/greenhouse-northwind-ai-4001001").json()
     assert detail["files"]["cv.pdf"] and "**Result: PASS**" in detail["verify"]
     assert client.get("/files/greenhouse-northwind-ai-4001001/cv.pdf").headers["content-type"] == "application/pdf"
