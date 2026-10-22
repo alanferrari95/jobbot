@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import shutil
 
+import yaml
+
 from . import db, pipeline
 from .config import EXAMPLES, app_dir, home
 from .grounding import report_md
@@ -49,6 +51,15 @@ def run(log=print) -> None:
         result = pipeline.verify_job(jid)
         log("4. VERIFY (grounding gate)\n   " + report_md(jid, result).split("## Keywords")[0].strip()
             .replace("\n", "\n   "))
+
+    jid = "ashby-fabrikam-health-f4b1-0004"
+    log(f"\n5. DRAFT without an agent: `jobbot draft {jid}` (local backend: no LLM, no key)")
+    pipeline.pack(jid)
+    from .drafter import draft
+    _, result, _ = draft(jid)
+    spec = yaml.safe_load((app_dir(jid) / "cv.yaml").read_text(encoding="utf-8"))
+    log("   Acme bullets, ordered by how much of the posting they cover: " + ", ".join(spec["experience"]["acme"][:3]))
+    log("   verify: " + ("PASS" if result["ok"] else "FAIL: " + "; ".join(result["errors"])))
 
     for jid, (status, note) in STATUSES.items():
         if con.execute("SELECT 1 FROM jobs WHERE id = ?", (jid,)).fetchone():
