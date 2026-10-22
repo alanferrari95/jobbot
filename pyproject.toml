@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jobbot"
+version = "0.2.0"
+description = "Personal job-search agent: ATS discovery, embedding ranking, agent-tailored CVs behind a deterministic grounding gate, and form prefill that stops before Submit."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Alan Cruz Ferrari" }]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.141.1",
+    "fastembed==0.8.1",
+    "numpy==2.5.3",
+    "playwright==1.63.0",
+    "pydantic==2.13.5",
+    "pymupdf==1.28.2",
+    "python-docx==1.2.0",
+    "pyyaml==6.0.3",
+    "requests==2.34.2",
+    "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+dev = ["httpx==0.28.1", "pytest==9.1.1", "ruff==0.17.1"]
+
+[project.scripts]
+jobbot = "jobbot.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/alanferrari95/jobbot"
+
+[tool.setuptools]
+packages = ["jobbot"]
+
+[tool.setuptools.package-data]
+jobbot = ["static/*.html"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py312"
+extend-exclude = [".demo", ".models", ".browser-profile", "applications", "profile", "cv", "linkedin", "prep", "data", "logs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+# E702/E731: the CLI wires subcommands one per line with `;`, and a few tiny helpers are lambdas.
+# E741: `l` is used for short-lived list items in comprehensions.
+ignore = ["E702", "E731", "E741"]
+
+[tool.ruff.lint.per-file-ignores]
+# Browser-side JavaScript embedded in Python strings.
+"jobbot/autofill.py" = ["E501"]
+"jobbot/formscan.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["."]

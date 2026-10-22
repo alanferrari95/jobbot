@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jobbot</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --text: #1b1f24; --muted: #5f6b7a; --line: #e3e7ec;
+  --accent: #1f4e79; --accent-2: #2f6fb0; --good: #1a7f4b; --warn: #a15c00; --bad: #b3261e;
+  --chip: #eef2f6; --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #111418; --panel: #1a1f25; --text: #e6e9ed; --muted: #9aa6b2; --line: #2a313a;
+          --accent: #7fb3e6; --accent-2: #9cc6ef; --good: #5cc98f; --warn: #e3a64a; --bad: #f07b72; --chip: #232a32; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
+header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0; color: var(--accent); }
+nav { display: flex; gap: 4px; flex-wrap: wrap; }
+nav button { background: none; border: 0; padding: 8px 12px; border-radius: 8px; color: var(--muted); cursor: pointer; font: inherit; }
+nav button.on { background: var(--chip); color: var(--text); font-weight: 600; }
+main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.card h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.big { font-size: 26px; font-weight: 700; }
+section { margin-top: 20px; }
+section > h2 { font-size: 15px; margin: 0 0 10px; }
+button.b, a.b { font: inherit; text-decoration: none; display: inline-block; border: 1px solid var(--line); background: var(--panel); color: var(--text); padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+button.b:hover, a.b:hover { border-color: var(--accent-2); }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+@media (prefers-color-scheme: dark) { button.primary { color: #0d1117; } }
+button.danger { color: var(--bad); }
+button:disabled { opacity: .5; cursor: default; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.chip { padding: 4px 10px; border-radius: 999px; background: var(--chip); border: 1px solid transparent; cursor: pointer; font-size: 13px; }
+.chip.on { border-color: var(--accent-2); color: var(--accent); font-weight: 600; }
+.job { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: start; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.job:last-child { border-bottom: 0; }
+.score { font-weight: 700; font-size: 18px; text-align: center; color: var(--accent); }
+.meta { color: var(--muted); font-size: 13px; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+.badge.ready, .badge.approved { color: var(--good); } .badge.applied, .badge.published { color: var(--accent); }
+.badge.skipped, .badge.rejected { color: var(--bad); } .badge.packed, .badge.draft { color: var(--warn); }
+details { margin-top: 8px; } summary { cursor: pointer; color: var(--accent-2); font-size: 13px; }
+pre { white-space: pre-wrap; background: var(--chip); padding: 10px; border-radius: 8px; font-size: 12.5px; max-height: 320px; overflow: auto; }
+textarea { width: 100%; min-height: 220px; font: 14px/1.5 system-ui, sans-serif; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+input[type=text], input[type=datetime-local], input[type=search] { font: inherit; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+.post { margin-bottom: 14px; }
+.post .head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.hint { background: var(--chip); border-radius: 8px; padding: 10px 12px; color: var(--text); }
+.news { padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; }
+a { color: var(--accent-2); }
+.toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+@media (max-width: 640px) { .job { grid-template-columns: 40px 1fr; } .actions { grid-column: 1 / -1; justify-content: flex-start; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>jobbot</h1>
+  <nav id="nav">
+    <button data-tab="home" class="on">Home</button>
+    <button data-tab="jobs">Jobs</button>
+    <button data-tab="applied">Applications</button>
+    <button data-tab="leads">Recruiters</button>
+    <button data-tab="posts">Posts</button>
+    <button data-tab="news">News</button>
+    <button data-tab="settings">Settings</button>
+  </nav>
+</header>
+<main id="main"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const api = async (url, opts = {}) => {
+  const r = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  if (!r.ok) { const t = await r.text(); toast('Error: ' + t.slice(0, 160)); throw new Error(t); }
+  return r.json();
+};
+const post = (url, body) => api(url, { method: 'POST', body: JSON.stringify(body || {}) });
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600); }
+const fmt = d => d ? new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+const LABEL = { new: 'new', packed: 'to tailor', ready: 'ready', applied: 'applied', interview: 'interview',
+  offer: 'offer', later: 'later', rejected: 'rejected', skipped: 'skipped', draft: 'draft', approved: 'approved', published: 'published' };
+const VERDICT = { verified: '✅ verified', location_unclear: '❔ location unclear', unverified: '⚠️ unverified',
+  discarded: '❌ discarded', ok_manual: '✅ OKed by you' };
+
+let tab = 'home', jobFilter = 'new', jobQuery = '';
+$('#nav').onclick = e => { const b = e.target.closest('button'); if (!b) return;
+  tab = b.dataset.tab; document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x === b)); render(); };
+
+async function render() { $('#main').innerHTML = '<p class="meta">Loading…</p>'; await ({ home, jobs, applied, leads, posts, news, settings })[tab](); }
+
+// ---------------------------------------------------------------- home
+async function home() {
+  const s = await api('/api/summary');
+  const tasks = (await api('/api/tasks')).filter(t => t.status === 'pending');
+  const j = s.jobs, p = s.posts;
+  $('#main').innerHTML = `
+    <div class="grid">
+      <div class="card"><h3>New</h3><div class="big">${j.new || 0}</div></div>
+      <div class="card"><h3>Ready to apply</h3><div class="big">${j.ready || 0}</div></div>
+      <div class="card"><h3>Applied</h3><div class="big">${(j.applied || 0) + (j.interview || 0) + (j.offer || 0)}</div></div>
+      <div class="card"><h3>Draft posts</h3><div class="big">${p.draft || 0}</div></div>
+      <div class="card"><h3>Published posts</h3><div class="big">${p.published || 0}</div></div>
+    </div>
+    <section class="card">
+      <h2>Apply in batch</h2>
+      <div class="row">
+        <button class="b" id="prep">Prepare all (${j.new || 0} new)</button>
+        <button class="b primary" id="batch" ${(j.ready || 0) ? '' : 'disabled'}>Open all ready applications (${j.ready || 0})</button>
+      </div>
+      <p class="meta">1) "Prepare all" packs every verified job that fits and queues it for the agent. 2) Ask Claude Code to process the queue (it tailors the CVs and writes the answers; the grounding gate checks them).
+      3) "Open all ready applications" opens Chrome with one prefilled tab per application: review it, solve the CAPTCHA if there is one, click Submit yourself and close the tab. 4) Mark it "applied" in Applications.</p>
+    </section>
+    <section class="card">
+      <h2>Runs</h2>
+      <p class="meta">Last: ${s.last_run ? fmt(s.last_run.finished) + ' · ' + esc(s.last_run.summary) : 'not run yet'}</p>
+      <button class="b primary" id="run" ${s.running ? 'disabled' : ''}>${s.running ? 'Running…' : 'Search now'}</button>
+      <span class="meta"> Finds jobs, prepares the best ones, fetches news and queues posts (~2 min). It also runs on its own twice a day.</span>
+    </section>
+    ${s.due_posts.length ? `<section class="card"><h2>To publish today</h2>${s.due_posts.map(d =>
+      `<div>#${d.id} · ${esc(d.topic)} <span class="meta">(${fmt(d.scheduled_for)})</span></div>`).join('')}
+      <div class="row"><button class="b" onclick="go('posts')">Go to Posts</button></div></section>` : ''}
+    <section class="card">
+      <h2>Queue for the agent (${tasks.length})</h2>
+      ${tasks.length ? `<p class="hint">Open Claude Code in this project and ask it to <b>process the queue</b>. It tailors the CVs and drafts the posts; you review them here.</p>
+        ${tasks.map(t => `<div class="meta">• ${esc(t.what)}</div>`).join('')}` : '<p class="meta">Nothing pending.</p>'}
+    </section>
+    ${s.needs_confirm.length ? `<section class="card"><h2>Answers to confirm</h2>
+      <p class="meta">Until you confirm them, autofill leaves these questions empty.</p>
+      <button class="b" onclick="go('settings')">Confirm in Settings</button></section>` : ''}`;
+  $('#prep').onclick = async () => { const r = await post('/api/prepare-all'); toast(r.prepared.length + ' prepared and queued'); home(); };
+  $('#batch').onclick = async () => { const r = await post('/api/apply-batch'); toast('Opening ' + r.opening + ' applications in Chrome'); };
+  $('#run').onclick = async () => { await post('/api/run/daily'); toast('Search started'); pollRun(); home(); };
+}
+function go(t) { document.querySelector(`#nav button[data-tab="${t}"]`).click(); }
+async function pollRun() { const s = await api('/api/summary'); if (s.running) setTimeout(pollRun, 4000); else { toast('Search finished'); if (tab === 'home') home(); } }
+
+// ---------------------------------------------------------------- jobs
+async function jobs() {
+  const list = await api(`/api/jobs?status=${jobFilter}&q=${encodeURIComponent(jobQuery)}`);
+  const chips = ['new', 'packed', 'ready', 'later', 'applied', 'interview', 'rejected', 'skipped', ''].map(s =>
+    `<span class="chip ${s === jobFilter ? 'on' : ''}" data-s="${s}">${s ? LABEL[s] : 'all'}</span>`).join('');
+  $('#main').innerHTML = `
+    <div class="chips" id="chips">${chips}<input type="search" id="q" placeholder="Search company or title" value="${esc(jobQuery)}"></div>
+    <div class="card" style="padding:0">${list.length ? list.map(jobRow).join('') : '<p class="meta" style="padding:14px">No results.</p>'}</div>`;
+  $('#chips').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; jobFilter = c.dataset.s; jobs(); };
+  $('#q').onchange = e => { jobQuery = e.target.value; jobs(); };
+}
+function jobRow(j) {
+  const a = [];
+  a.push(`<a class="b" href="${esc(j.url)}" target="_blank" rel="noopener">Posting</a>`);
+  if (j.status === 'new') a.push(`<button class="b primary" onclick="jobAct('${j.id}','pack')">Prepare</button>`);
+  if (['packed', 'ready'].includes(j.status)) a.push(`<button class="b" onclick="jobAct('${j.id}','verify')">Verify</button>`);
+  if (j.status === 'later') a.push(`<button class="b" onclick="setStatus('${j.id}','ready')">Move to ready</button>`);
+  if (j.status === 'ready') a.push(`<button class="b" onclick="setStatus('${j.id}','later')">Later</button>`);
+  if (j.status === 'ready') a.push(`<button class="b primary" onclick="jobAct('${j.id}','apply')">Prefill form</button>`,
+                                   `<button class="b" onclick="setStatus('${j.id}','applied')">Mark applied</button>`);
+  if (j.status === 'applied') a.push(`<button class="b" onclick="setStatus('${j.id}','interview')">Interview</button>`,
+                                     `<button class="b" onclick="setStatus('${j.id}','rejected')">Rejected</button>`);
+  if (!['skipped', 'applied', 'interview', 'offer'].includes(j.status)) a.push(`<button class="b danger" onclick="setStatus('${j.id}','skipped')">Skip</button>`);
+  return `<div class="job">
+    <div class="score">${Math.round(j.score)}</div>
+    <div><b>${esc(j.company)}</b> · ${esc(j.title)} <span class="badge ${j.status}">${LABEL[j.status]}</span>
+      ${j.verdict ? `<span class="badge" title="${esc(j.verdict_reasons || '')}">${VERDICT[j.verdict] || esc(j.verdict)}</span>` : ''}
+      <div class="meta">${esc(j.location)} · ${esc(j.source)} · seen ${fmt(j.first_seen)}${j.applied_at ? ' · applied ' + fmt(j.applied_at) : ''}</div>
+      ${j.missing ? `<div class="meta">Asks for (not in your profile): ${esc(j.missing)}</div>` : ''}
+      <details ontoggle="if(this.open) jobDetail(this, '${j.id}')"><summary>Details, CV and verify report</summary><div>…</div></details>
+    </div>
+    <div class="actions">${a.join('')}</div></div>`;
+}
+async function jobDetail(el, id) {
+  const d = await api('/api/jobs/' + encodeURIComponent(id));
+  el.querySelector('div').innerHTML = `
+    <p class="meta">${esc(d.reasons)}</p>
+    ${d.files['cv.pdf'] ? `<p><a href="/files/${encodeURIComponent(id)}/cv.pdf" target="_blank">Open tailored CV (PDF)</a></p>` : '<p class="meta">No tailored CV yet.</p>'}
+    ${d.verify ? `<pre>${esc(d.verify)}</pre>` : ''}
+    ${d.people ? `<details><summary>People to follow at ${esc(d.company)}</summary><pre>${esc(d.people)}</pre></details>` : ''}
+    <details><summary>Full description</summary><pre>${esc(d.description)}</pre></details>`;
+}
+async function jobAct(id, act) {
+  const res = await post(`/api/jobs/${encodeURIComponent(id)}/${act}`);
+  if (act === 'pack') toast('Prepared. It is queued for the agent to tailor the CV.');
+  if (act === 'verify') toast(res.ok ? 'Verify: PASS' : 'Verify: FAIL (' + res.errors.length + ' errors)');
+  if (act === 'apply') toast('Chrome opens with the form prefilled. Review it and submit it yourself.');
+  jobs();
+}
+async function setStatus(id, status) { await post(`/api/jobs/${encodeURIComponent(id)}/status`, { status }); toast('Status: ' + LABEL[status]); jobs(); }
+
+// ---------------------------------------------------------------- applied (tracking)
+async function applied() {
+  const all = await api('/api/jobs');
+  const ready = all.filter(j => j.status === 'ready');
+  const done = all.filter(j => ['applied', 'interview', 'offer', 'rejected'].includes(j.status))
+                  .sort((a, b) => (b.applied_at || '').localeCompare(a.applied_at || ''));
+  const row = j => `<div class="job"><div class="score">${Math.round(j.score)}</div>
+    <div><b>${esc(j.company)}</b> · ${esc(j.title)} <span class="badge ${j.status}">${LABEL[j.status]}</span>
+      <div class="meta">${esc(j.location)} · ${j.applied_at ? 'applied ' + fmt(j.applied_at) : esc(j.note || 'ready to send')}</div>
+      <div class="meta"><a href="${esc(j.url)}" target="_blank" rel="noopener">posting</a> · <a href="/files/${encodeURIComponent(j.id)}/cv.pdf" target="_blank">${j.status === 'ready' ? 'tailored CV' : 'CV sent'}</a></div></div>
+    <div class="actions">${j.status === 'ready' ? `<button class="b primary" onclick="setStatus2('${j.id}','applied')">Mark applied</button>` :
+      ['interview', 'offer', 'rejected'].map(s => `<button class="b" onclick="setStatus2('${j.id}','${s}')">${LABEL[s]}</button>`).join('')}</div></div>`;
+  $('#main').innerHTML = `
+    <section><h2>Ready to send (${ready.length})</h2><div class="card" style="padding:0">${ready.map(row).join('') || '<p class="meta" style="padding:14px">None.</p>'}</div></section>
+    <section><h2>Applied (${done.length})</h2><div class="card" style="padding:0">${done.map(row).join('') || '<p class="meta" style="padding:14px">None yet.</p>'}</div></section>`;
+}
+async function setStatus2(id, status) { await post(`/api/jobs/${encodeURIComponent(id)}/status`, { status }); toast('Status: ' + LABEL[status]); applied(); }
+
+// ---------------------------------------------------------------- recruiter leads
+async function leads() {
+  const [list, searches] = await Promise.all([api('/api/leads'), api('/api/leads/searches')]);
+  $('#main').innerHTML = `
+    <section class="card"><h2>Find recruiter posts on LinkedIn</h2>
+      <p class="meta">Open these searches yourself (newest first). If a post is useful, copy its text and paste it below. Nothing is automated on LinkedIn.</p>
+      ${searches.map(s => `<div><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.q)}</a></div>`).join('')}</section>
+    <section class="card"><h2>Add a post</h2>
+      <textarea id="lt" style="min-height:120px" placeholder="Paste the post text (with the email or the instructions)"></textarea>
+      <div class="row"><input type="text" id="lu" placeholder="Post URL" style="flex:1;min-width:200px">
+        <input type="text" id="la" placeholder="Author / company"><button class="b primary" id="ladd">Add</button></div></section>
+    <section><h2>Leads (${list.length})</h2>${list.map(l => `<div class="card post">
+      <div class="head"><b>${esc(l.author || l.source)}</b> <span class="badge ${l.status === 'new' ? 'draft' : 'published'}">${esc(l.status)}</span>
+        <span class="meta">${esc(l.how || 'no clear instructions')}</span></div>
+      <details><summary>Post text</summary><pre>${esc(l.text)}</pre></details>
+      <div class="meta">${l.emails.map(e => esc(e)).join(', ')} ${l.url ? `· <a href="${esc(l.url)}" target="_blank" rel="noopener">post</a>` : ''}</div>
+      <details><summary>Suggested message</summary><pre>${esc(l.draft.subject)}
+
+${esc(l.draft.body)}</pre></details>
+      <div class="row">
+        ${l.draft.mailto ? `<a class="b" href="${esc(l.draft.mailto)}">Open email (attach the CV)</a>` : ''}
+        <button class="b" onclick="copyLead(${l.id})">Copy message</button>
+        <button class="b" onclick="leadStatus(${l.id},'contacted')">Contacted</button>
+        <button class="b" onclick="leadStatus(${l.id},'replied')">Replied</button>
+        <button class="b danger" onclick="leadStatus(${l.id},'ignored')">Ignore</button></div></div>`).join('') || '<p class="meta">No leads yet.</p>'}</section>`;
+  window._leads = list;
+  $('#ladd').onclick = async () => { const r = await post('/api/leads', { text: $('#lt').value, url: $('#lu').value, author: $('#la').value });
+    toast(r.duplicate ? 'Already added' : 'Added'); leads(); };
+}
+async function copyLead(id) { const l = _leads.find(x => x.id === id); await navigator.clipboard.writeText(l.draft.body); toast('Message copied'); }
+async function leadStatus(id, status) { await post(`/api/leads/${id}/status`, { status }); toast('Updated'); leads(); }
+
+// ---------------------------------------------------------------- posts
+async function posts() {
+  const list = await api('/api/posts');
+  $('#main').innerHTML = list.length ? list.map(postCard).join('') :
+    '<p class="hint">No posts yet. Drafts show up here when the agent processes the queue.</p>';
+}
+function postCard(p) {
+  const when = p.scheduled_for ? p.scheduled_for.slice(0, 16) : '';
+  return `<div class="card post" id="post-${p.id}">
+    <div class="head"><b>#${p.id} ${esc(p.topic)}</b>
+      <span class="badge">${p.kind === 'frontier' ? '🤖 Claude Code series' : 'personal'}</span>
+      <span class="badge ${p.status}">${LABEL[p.status]}</span>
+      ${p.published_at ? `<span class="meta">published ${fmt(p.published_at)}</span>` : ''}</div>
+    <textarea id="t-${p.id}" oninput="$('#c-${p.id}').textContent=this.value.length">${esc(p.text)}</textarea>
+    <div class="meta"><span id="c-${p.id}">${p.text.length}</span> characters · Sources (paste them in the first comment):
+      ${p.sources.map(s => `<a href="${esc(s)}" target="_blank" rel="noopener">${esc(s)}</a>`).join(' · ') || '-'}</div>
+    <div class="row">
+      <label class="meta">Scheduled <input type="datetime-local" id="w-${p.id}" value="${when}"></label>
+      <button class="b" onclick="savePost(${p.id})">Save</button>
+      ${p.status === 'draft' ? `<button class="b primary" onclick="savePost(${p.id},'approved')">Approve</button>
+                                <button class="b danger" onclick="savePost(${p.id},'rejected')">Reject</button>` : ''}
+      ${p.status === 'approved' ? `<button class="b primary" onclick="publish(${p.id})">Publish on LinkedIn</button>
+                                   <button class="b" onclick="savePost(${p.id},'published')">Mark published</button>` : ''}
+    </div></div>`;
+}
+async function savePost(id, status) {
+  const body = { text: $('#t-' + id).value, scheduled_for: $('#w-' + id).value || null };
+  if (status) body.status = status;
+  const r = await post('/api/posts/' + id, body);
+  toast(status === 'approved' ? 'Approved for ' + fmt(r.scheduled_for) : 'Saved');
+  posts();
+}
+async function publish(id) {
+  const text = $('#t-' + id).value;
+  try { await navigator.clipboard.writeText(text); } catch (e) {}
+  window.open('https://www.linkedin.com/feed/?shareActive=true&text=' + encodeURIComponent(text), '_blank', 'noopener');
+  toast('Text copied. Review it on LinkedIn, publish it, then click "Mark published".');
+}
+
+// ---------------------------------------------------------------- news
+async function news() {
+  const list = await api('/api/news');
+  $('#main').innerHTML = `<p class="hint">News from the last few days (official blogs + the most upvoted AI stories on Hacker News). "Draft a post" adds it to the queue.</p>
+    <div class="card">${list.map(n => `<div class="news">
+      <div><a href="${esc(n.url)}" target="_blank" rel="noopener"><b>${esc(n.title)}</b></a>
+        <div class="meta">${esc(n.source)} · ${fmt(n.published)}${n.points ? ' · ' + n.points + ' pts' : ''}</div></div>
+      ${n.used ? '<span class="badge published">used</span>' : `<button class="b" onclick="queueNews('${n.id}')">Draft a post</button>`}
+    </div>`).join('') || '<p class="meta">No news yet: click "Search now" on Home.</p>'}</div>`;
+}
+async function queueNews(id) { const r = await post(`/api/news/${id}/queue`); toast(r.queued ? 'Queued' : 'Already queued'); }
+
+// ---------------------------------------------------------------- settings
+async function settings() {
+  const a = await api('/api/answers');
+  $('#main').innerHTML = `
+    <section class="card"><h2>Standard form answers</h2>
+      <p class="meta">Answers marked "to confirm" are not filled in until you confirm them.</p>
+      ${a.questions.map((q, i) => `<div style="margin:12px 0">
+        <div class="meta"><code>${esc(q.match)}</code> ${q.confirm ? '<span class="badge draft">to confirm</span>' : ''}</div>
+        <div class="row"><input type="text" id="a-${i}" value="${esc(q.answer)}" style="flex:1;min-width:240px">
+          <button class="b ${q.confirm ? 'primary' : ''}" onclick="confirmAns(${i})">${q.confirm ? 'Confirm' : 'Save'}</button></div></div>`).join('')}
+    </section>
+    <section class="card"><h2>Base CV</h2><a href="/files/base-cv.pdf" target="_blank">Open base CV (PDF)</a>
+      <p class="meta">Edit it in profile/base_cv.yaml: it is the single source of truth the grounding gate checks against.</p></section>`;
+  window._answers = a.questions;
+}
+async function confirmAns(i) { await post('/api/answers/confirm', { match: _answers[i].match, answer: $('#a-' + i).value }); toast('Saved'); settings(); }
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Deny by default. This folder is also where jobbot keeps personal data (profile/, applications/, cv/,
+# .browser-profile/ with cookies, .models/, logs/...). Only the paths re-included below are part of the repo.
+/*
+!/.gitignore
+!/.gitattributes
+!/.github/
+!/.claude/
+/.claude/*
+!/.claude/skills/
+!/.claude/launch.json
+!/jobbot/
+!/tests/
+!/examples/
+!/docs/
+!/scripts/
+!/pyproject.toml
+!/README.md
+!/LICENSE
+!/TAILORING.md
+!/POSTING.md
+
+# Never, even inside the folders above
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+/examples/profile/companies_auto.yaml
