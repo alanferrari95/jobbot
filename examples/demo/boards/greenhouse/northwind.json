@@ -1,0 +1,44 @@
+{
+ "jobs": [
+  {
+   "id": 4001001,
+   "title": "Senior Machine Learning Engineer, LLM Platform",
+   "location": {
+    "name": "Remote - LATAM"
+   },
+   "updated_at": "2026-10-15T12:00:00-04:00",
+   "absolute_url": "https://example.com/northwind/jobs/4001001",
+   "content": "&lt;p&gt;Northwind AI builds AI copilots for logistics companies. We are a remote-first team of 60.&lt;/p&gt;&lt;p&gt;You will design, ship and operate retrieval-augmented generation (RAG) systems used by thousands of dispatchers.&lt;/p&gt;&lt;p&gt;What you&amp;#x27;ll do:&lt;/p&gt;&lt;li&gt;Build LLM applications in Python with structured outputs and retrieval over our document store.&lt;/li&gt;&lt;li&gt;Own evaluation: build gold sets, LLM-as-judge rubrics and regression suites that run in CI/CD.&lt;/li&gt;&lt;li&gt;Deploy services with FastAPI and Docker on GCP (Cloud Run, Vertex AI, BigQuery).&lt;/li&gt;&lt;li&gt;Monitor quality, latency and token cost in production, and decide what ships.&lt;/li&gt;&lt;p&gt;What we&amp;#x27;re looking for:&lt;/p&gt;&lt;li&gt;5+ years of experience in machine learning engineering, with LLM applications in production.&lt;/li&gt;&lt;li&gt;Strong Python and SQL; experience with prompt engineering and embeddings.&lt;/li&gt;&lt;li&gt;Experience with Terraform is a plus.&lt;/li&gt;&lt;p&gt;This role is fully remote for candidates based in LATAM, as an independent contractor paid in USD.&lt;/p&gt;"
+  },
+  {
+   "id": 4001002,
+   "title": "Machine Learning Engineer",
+   "location": {
+    "name": "Remote - US"
+   },
+   "updated_at": "2026-10-15T12:00:00-04:00",
+   "absolute_url": "https://example.com/northwind/jobs/4001002",
+   "content": "&lt;p&gt;Northwind AI builds AI copilots for logistics companies. We are a remote-first team of 60.&lt;/p&gt;&lt;p&gt;Build ranking models for our routing product.&lt;/p&gt;&lt;li&gt;3+ years of experience with Python and PyTorch.&lt;/li&gt;&lt;li&gt;Must be located in the United States; you must be authorized to work in the US.&lt;/li&gt;&lt;p&gt;This position is remote within the US only.&lt;/p&gt;"
+  },
+  {
+   "id": 4001003,
+   "title": "Staff Machine Learning Engineer",
+   "location": {
+    "name": "Remote - LATAM"
+   },
+   "updated_at": "2026-10-15T12:00:00-04:00",
+   "absolute_url": "https://example.com/northwind/jobs/4001003",
+   "content": "&lt;p&gt;Northwind AI builds AI copilots for logistics companies. We are a remote-first team of 60.&lt;/p&gt;&lt;p&gt;Set the technical direction for ML across the company and mentor a team of 8 engineers.&lt;/p&gt;&lt;li&gt;10+ years of experience, including 4 as a staff or principal engineer.&lt;/li&gt;&lt;li&gt;Deep experience with LLM systems, evaluation and MLOps on GCP.&lt;/li&gt;"
+  },
+  {
+   "id": 4001004,
+   "title": "Data Engineer",
+   "location": {
+    "name": "Remote - LATAM"
+   },
+   "updated_at": "2026-10-15T12:00:00-04:00",
+   "absolute_url": "https://example.com/northwind/jobs/4001004",
+   "content": "&lt;p&gt;Northwind AI builds AI copilots for logistics companies. We are a remote-first team of 60.&lt;/p&gt;&lt;p&gt;Own our data pipelines: ingestion, modeling and quality.&lt;/p&gt;&lt;li&gt;Experience with Airflow, dbt and Spark.&lt;/li&gt;&lt;li&gt;Strong SQL and Python.&lt;/li&gt;"
+  }
+ ]
+}

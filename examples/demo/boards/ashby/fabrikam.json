@@ -1,0 +1,68 @@
+{
+ "jobs": [
+  {
+   "id": "f4b1-0001",
+   "title": "Applied AI Engineer, LLM Evaluation",
+   "location": "Remote - Americas",
+   "secondaryLocations": [],
+   "isRemote": true,
+   "isListed": true,
+   "descriptionPlain": "Fabrikam Health helps clinics automate prior authorizations with AI.\n\nOwn the evaluation of our prior-authorization assistant.\n- Build gold sets with clinicians, LLM-as-judge rubrics and regression tests that gate every release.\n- Python, SQL, structured outputs, prompt engineering.\n- Deploy evaluation jobs on GCP (Vertex AI pipelines, BigQuery).\n- 4+ years of experience in ML engineering.\nRemote across the Americas, including Latin America.",
+   "jobUrl": "https://example.com/fabrikam/f4b1-0001",
+   "applyUrl": "https://example.com/fabrikam/f4b1-0001/application",
+   "publishedAt": "2026-10-14T09:00:00.000+00:00",
+   "employmentType": "FullTime",
+   "compensation": {
+    "compensationTierSummary": "$120K – $150K"
+   }
+  },
+  {
+   "id": "f4b1-0002",
+   "title": "Machine Learning Engineer",
+   "location": "Remote - Europe",
+   "secondaryLocations": [],
+   "isRemote": true,
+   "isListed": true,
+   "descriptionPlain": "Fabrikam Health helps clinics automate prior authorizations with AI.\n\nBuild NLP models for clinical notes.\n- Fluent German is required: you will work with German-speaking clinics.\n- Python, PyTorch, transformers.",
+   "jobUrl": "https://example.com/fabrikam/f4b1-0002",
+   "applyUrl": "https://example.com/fabrikam/f4b1-0002/application",
+   "publishedAt": "2026-10-14T09:00:00.000+00:00",
+   "employmentType": "FullTime",
+   "compensation": {
+    "compensationTierSummary": ""
+   }
+  },
+  {
+   "id": "f4b1-0003",
+   "title": "Senior Data Scientist, Forecasting",
+   "location": "Remote - LATAM",
+   "secondaryLocations": [],
+   "isRemote": true,
+   "isListed": true,
+   "descriptionPlain": "Fabrikam Health helps clinics automate prior authorizations with AI.\n\nForecast clinic demand and staffing.\n- XGBoost, time-series forecasting, Python and SQL.\nCompensation: USD 2,000 - 2,500 / month, contractor, remote from LATAM.",
+   "jobUrl": "https://example.com/fabrikam/f4b1-0003",
+   "applyUrl": "https://example.com/fabrikam/f4b1-0003/application",
+   "publishedAt": "2026-10-14T09:00:00.000+00:00",
+   "employmentType": "FullTime",
+   "compensation": {
+    "compensationTierSummary": ""
+   }
+  },
+  {
+   "id": "f4b1-0004",
+   "title": "Generative AI Engineer",
+   "location": "Remote - Worldwide",
+   "secondaryLocations": [],
+   "isRemote": true,
+   "isListed": true,
+   "descriptionPlain": "Fabrikam Health helps clinics automate prior authorizations with AI.\n\nPrototype and ship generative AI features: summarization of clinical documents and patient messaging.\n- Python, LLMs (OpenAI, Gemini), RAG, prompt engineering.\n- Evaluation of LLM outputs and monitoring in production.\n- Docker and CI/CD.\nRemote, worldwide.",
+   "jobUrl": "https://example.com/fabrikam/f4b1-0004",
+   "applyUrl": "https://example.com/fabrikam/f4b1-0004/application",
+   "publishedAt": "2026-10-14T09:00:00.000+00:00",
+   "employmentType": "FullTime",
+   "compensation": {
+    "compensationTierSummary": ""
+   }
+  }
+ ]
+}

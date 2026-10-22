@@ -1,0 +1,5 @@
+# FICTIONAL example. Topics for personal LinkedIn posts; `jobbot daily` queues one per week for the agent.
+personal_ideas:
+  - "What 92% field-level accuracy on claims extraction took: gold sets before prompts"
+  - "Routing simple pages to a smaller model: how we cut LLM cost per document by 60%"
+  - "LLM-as-judge is only useful once you measure it against humans"

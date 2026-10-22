@@ -1,0 +1,86 @@
+[
+ {
+  "id": "c0a1e5d2-0001",
+  "text": "AI Engineer, Document Intelligence",
+  "categories": {
+   "location": "Remote (Worldwide)",
+   "commitment": "Full-time"
+  },
+  "workplaceType": "remote",
+  "descriptionPlain": "Contoso Labs turns insurance and banking paperwork into structured data with LLMs.\n\nContoso Labs extracts structured data from insurance claims and bank statements with LLMs.\nYou will own extraction pipelines end to end: page classification, LLM extraction with structured outputs,\nand evaluation with per-field precision and recall against labeled gold sets.",
+  "lists": [
+   {
+    "text": "Requirements",
+    "content": "<li>5+ years of experience in machine learning, 2+ with LLMs in production</li><li>Python, SQL and prompt engineering</li><li>Experience evaluating LLM outputs (gold sets, LLM-as-judge)</li><li>Docker, FastAPI and CI/CD</li>"
+   },
+   {
+    "text": "Nice to have",
+    "content": "<li>OCR experience</li><li>GCP (Vertex AI, BigQuery)</li>"
+   }
+  ],
+  "additionalPlain": "Remote from anywhere in the world. Paid in USD.",
+  "hostedUrl": "https://example.com/contoso-labs/c0a1e5d2-0001",
+  "applyUrl": "https://example.com/contoso-labs/c0a1e5d2-0001/apply",
+  "createdAt": 1760500000000
+ },
+ {
+  "id": "c0a1e5d2-0002",
+  "text": "MLOps Engineer",
+  "categories": {
+   "location": "Remote (Worldwide)",
+   "commitment": "Full-time"
+  },
+  "workplaceType": "remote",
+  "descriptionPlain": "Contoso Labs turns insurance and banking paperwork into structured data with LLMs.\n\nRun our ML platform: training pipelines, model registry and serving.",
+  "lists": [
+   {
+    "text": "Requirements",
+    "content": "<li>Hands-on experience with Kubernetes and AWS (SageMaker, EKS)</li><li>Airflow and MLflow in production</li><li>Python and Terraform</li>"
+   }
+  ],
+  "additionalPlain": "Remote, worldwide.",
+  "hostedUrl": "https://example.com/contoso-labs/c0a1e5d2-0002",
+  "applyUrl": "https://example.com/contoso-labs/c0a1e5d2-0002/apply",
+  "createdAt": 1760500000000
+ },
+ {
+  "id": "c0a1e5d2-0003",
+  "text": "Junior Data Scientist",
+  "categories": {
+   "location": "Remote (Worldwide)",
+   "commitment": "Full-time"
+  },
+  "workplaceType": "remote",
+  "descriptionPlain": "Contoso Labs turns insurance and banking paperwork into structured data with LLMs.\n\nHelp our analytics team build dashboards and simple models.",
+  "lists": [
+   {
+    "text": "Requirements",
+    "content": "<li>0-2 years of experience</li><li>Python and SQL</li>"
+   }
+  ],
+  "additionalPlain": "",
+  "hostedUrl": "https://example.com/contoso-labs/c0a1e5d2-0003",
+  "applyUrl": "https://example.com/contoso-labs/c0a1e5d2-0003/apply",
+  "createdAt": 1760500000000
+ },
+ {
+  "id": "c0a1e5d2-0004",
+  "text": "Machine Learning Engineer, Recommendations",
+  "categories": {
+   "location": "Berlin, Germany",
+   "commitment": "Full-time"
+  },
+  "workplaceType": "hybrid",
+  "descriptionPlain": "Contoso Labs turns insurance and banking paperwork into structured data with LLMs.\n\nBuild recommendation models for our banking app. Hybrid, 3 days a week in our Berlin office.",
+  "lists": [
+   {
+    "text": "Requirements",
+    "content": "<li>PyTorch</li><li>4+ years of experience</li>"
+   }
+  ],
+  "additionalPlain": "",
+  "hostedUrl": "https://example.com/contoso-labs/c0a1e5d2-0004",
+  "applyUrl": "https://example.com/contoso-labs/c0a1e5d2-0004/apply",
+  "createdAt": 1760500000000
+ }
+]

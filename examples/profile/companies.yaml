@@ -1,0 +1,117 @@
+# Company job boards that `jobbot discover` reads through their public APIs (Greenhouse, Lever, Ashby).
+# 112 boards of remote-friendly tech/AI companies, tokens verified on 2026-09-27. Add more: {name, ats, token}.
+# `jobbot discover-boards` finds more from open company directories and writes companies_auto.yaml.
+
+companies:
+  - {name: "Affirm", ats: greenhouse, token: affirm}
+  - {name: "Airtable", ats: greenhouse, token: airtable}
+  - {name: "Anthropic", ats: greenhouse, token: anthropic}
+  - {name: "Asana", ats: greenhouse, token: asana}
+  - {name: "Brex", ats: greenhouse, token: brex}
+  - {name: "Canonical", ats: greenhouse, token: canonical}
+  - {name: "Chime", ats: greenhouse, token: chime}
+  - {name: "Cloudflare", ats: greenhouse, token: cloudflare}
+  - {name: "Contentful", ats: greenhouse, token: contentful}
+  - {name: "Coursera", ats: greenhouse, token: coursera}
+  - {name: "Databricks", ats: greenhouse, token: databricks}
+  - {name: "Datadog", ats: greenhouse, token: datadog}
+  - {name: "Discord", ats: greenhouse, token: discord}
+  - {name: "Dropbox", ats: greenhouse, token: dropbox}
+  - {name: "Duolingo", ats: greenhouse, token: duolingo}
+  - {name: "Elastic", ats: greenhouse, token: elastic}
+  - {name: "Figma", ats: greenhouse, token: figma}
+  - {name: "Fivetran", ats: greenhouse, token: fivetran}
+  - {name: "GitLab", ats: greenhouse, token: gitlab}
+  - {name: "Grafana Labs", ats: greenhouse, token: grafanalabs}
+  - {name: "Gusto", ats: greenhouse, token: gusto}
+  - {name: "Instacart", ats: greenhouse, token: instacart}
+  - {name: "LaunchDarkly", ats: greenhouse, token: launchdarkly}
+  - {name: "Lyft", ats: greenhouse, token: lyft}
+  - {name: "Mattermost", ats: greenhouse, token: mattermost}
+  - {name: "MongoDB", ats: greenhouse, token: mongodb}
+  - {name: "Mozilla", ats: greenhouse, token: mozilla}
+  - {name: "N26", ats: greenhouse, token: n26}
+  - {name: "Netlify", ats: greenhouse, token: netlify}
+  - {name: "New Relic", ats: greenhouse, token: newrelic}
+  - {name: "PagerDuty", ats: greenhouse, token: pagerduty}
+  - {name: "Pinterest", ats: greenhouse, token: pinterest}
+  - {name: "Reddit", ats: greenhouse, token: reddit}
+  - {name: "Remote.com", ats: greenhouse, token: remotecom}
+  - {name: "Robinhood", ats: greenhouse, token: robinhood}
+  - {name: "Roblox", ats: greenhouse, token: roblox}
+  - {name: "Samsara", ats: greenhouse, token: samsara}
+  - {name: "Scale AI", ats: greenhouse, token: scaleai}
+  - {name: "Sourcegraph", ats: greenhouse, token: sourcegraph91}
+  - {name: "Stripe", ats: greenhouse, token: stripe}
+  - {name: "Tailscale", ats: greenhouse, token: tailscale}
+  - {name: "Toast", ats: greenhouse, token: toast}
+  - {name: "Turing", ats: greenhouse, token: turing}
+  - {name: "Twilio", ats: greenhouse, token: twilio}
+  - {name: "Typeform", ats: greenhouse, token: typeform}
+  - {name: "Vercel", ats: greenhouse, token: vercel}
+  - {name: "Veriff", ats: greenhouse, token: veriff}
+  - {name: "Webflow", ats: greenhouse, token: webflow}
+  - {name: "Wise", ats: greenhouse, token: wise}
+  - {name: "Wizeline", ats: greenhouse, token: wizeline}
+  - {name: "Anyscale", ats: lever, token: anyscale}
+  - {name: "Apply Digital", ats: lever, token: applydigital}
+  - {name: "Binance", ats: lever, token: binance}
+  - {name: "Despegar", ats: lever, token: despegar}
+  - {name: "Hive", ats: lever, token: hive}
+  - {name: "Jobgether", ats: lever, token: jobgether}
+  - {name: "Outreach", ats: lever, token: outreach}
+  - {name: "Palantir", ats: lever, token: palantir}
+  - {name: "SonarSource", ats: lever, token: sonarsource}
+  - {name: "Sonatype", ats: lever, token: sonatype}
+  - {name: "Spotify", ats: lever, token: spotify}
+  - {name: "Toptal", ats: lever, token: toptal}
+  - {name: "Zeta", ats: lever, token: zeta}
+  - {name: "Airbyte", ats: ashby, token: airbyte}
+  - {name: "Alan", ats: ashby, token: alan}
+  - {name: "Anyscale", ats: ashby, token: anyscale}
+  - {name: "Ashby", ats: ashby, token: ashby}
+  - {name: "Baseten", ats: ashby, token: baseten}
+  - {name: "Character.AI", ats: ashby, token: character}
+  - {name: "Cognition", ats: ashby, token: cognition}
+  - {name: "Cohere", ats: ashby, token: cohere}
+  - {name: "Cursor", ats: ashby, token: cursor}
+  - {name: "Decagon", ats: ashby, token: decagon}
+  - {name: "Deepgram", ats: ashby, token: deepgram}
+  - {name: "ElevenLabs", ats: ashby, token: elevenlabs}
+  - {name: "Harvey", ats: ashby, token: harvey}
+  - {name: "Hex", ats: ashby, token: hex}
+  - {name: "Hightouch", ats: ashby, token: hightouch}
+  - {name: "LangChain", ats: ashby, token: langchain}
+  - {name: "Linear", ats: ashby, token: linear}
+  - {name: "LiveKit", ats: ashby, token: livekit}
+  - {name: "Mercor", ats: ashby, token: mercor}
+  - {name: "Modal", ats: ashby, token: modal}
+  - {name: "Multiverse", ats: ashby, token: multiverse}
+  - {name: "Mux", ats: ashby, token: mux}
+  - {name: "Neon", ats: ashby, token: neon}
+  - {name: "Notion", ats: ashby, token: notion}
+  - {name: "Omni", ats: ashby, token: omni}
+  - {name: "OpenAI", ats: ashby, token: openai}
+  - {name: "Pennylane", ats: ashby, token: pennylane}
+  - {name: "Perplexity", ats: ashby, token: perplexity}
+  - {name: "Pinecone", ats: ashby, token: pinecone}
+  - {name: "Plaid", ats: ashby, token: plaid}
+  - {name: "PostHog", ats: ashby, token: posthog}
+  - {name: "Prefect", ats: ashby, token: prefect}
+  - {name: "Qonto", ats: ashby, token: qonto}
+  - {name: "Railway", ats: ashby, token: railway}
+  - {name: "Ramp", ats: ashby, token: ramp}
+  - {name: "Render", ats: ashby, token: render}
+  - {name: "Replit", ats: ashby, token: replit}
+  - {name: "Runway", ats: ashby, token: runway}
+  - {name: "Sardine", ats: ashby, token: sardine}
+  - {name: "Sierra", ats: ashby, token: sierra}
+  - {name: "Supabase", ats: ashby, token: supabase}
+  - {name: "Synthesia", ats: ashby, token: synthesia}
+  - {name: "Temporal", ats: ashby, token: temporal}
+  - {name: "TRM Labs", ats: ashby, token: trm-labs}
+  - {name: "Vanta", ats: ashby, token: vanta}
+  - {name: "Vapi", ats: ashby, token: vapi}
+  - {name: "Weaviate", ats: ashby, token: weaviate}
+  - {name: "Writer", ats: ashby, token: writer}
+  - {name: "Zapier", ats: ashby, token: zapier}

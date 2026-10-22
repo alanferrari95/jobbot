@@ -1,0 +1,67 @@
+# FICTIONAL example. Standard answers for application forms (jobbot/autofill.py).
+# Per-job answers written by the agent go to applications/<id>/answers.yaml and take precedence.
+# Answers with `confirm: true` are never filled in until you confirm them in the dashboard (Settings).
+personal:
+  first_name: Avery
+  last_name: Quinn
+  full_name: Avery Quinn
+  email: avery.quinn@example.com
+  phone: +1 555 0142
+  linkedin: https://www.example.com/in/avery-quinn
+  github: https://example.com/avery-quinn
+  website: https://example.com/avery-quinn/doc-eval-kit
+  location: Montevideo, Uruguay
+  current_company: Acme Analytics
+  current_title: Senior Machine Learning Engineer
+questions:
+- match: authori[sz]ed to work.*(united states|u\.s\.|\bus\b)|(united states|u\.s\.).*authori[sz]ed
+  answer: No. I would work as an independent contractor from Uruguay.
+- match: sponsor
+  answer: No sponsorship needed for a contractor engagement from Uruguay.
+- match: where.*(located|based)|current location|city
+  answer: Montevideo, Uruguay (UTC-3).
+- match: time ?zone
+  answer: UTC-3 (Uruguay). Full overlap with US Eastern working hours.
+- match: salary|compensation|(hourly|daily|monthly|day) rate|rate expectation|expected pay
+  answer: USD 5,500 per month as a full-time contractor. Open to discussing the full package.
+  confirm: true
+- match: notice period|when can you start|start date|availability
+  answer: I can start 3 weeks after an offer.
+  confirm: true
+- match: years of experience.*(machine learning|ml|data science)
+  answer: '6'
+- match: years of experience.*(llm|generative|genai)
+  answer: '3'
+- match: years of experience.*python
+  answer: '6'
+- match: english
+  answer: Full professional proficiency.
+- match: how did you hear|where did you (find|hear)
+  answer: Company careers page.
+- match: contractor|contract basis|independent contractor
+  answer: Yes, I am open to working as an independent contractor.
+- match: relocat
+  answer: I am looking for remote roles; I am not planning to relocate.
+salary:
+  minimum_usd_year: 54000
+  target_usd_year: 72000
+# Get on Board step 1 (only if you apply through getonbrd.com). HTML, as the site's editor expects.
+getonboard:
+  experience_html: "<div>- Senior Machine Learning Engineer, Acme Analytics (2022 – Present). LLM document extraction
+    and RAG assistants for insurance and retail clients.<br>- Data Scientist, Globex Retail (2020 – 2022).</div>"
+  education_html: "<div>BSc in Computer Engineering, Universidad de la República (2018).</div>"
+  english_level: Avanzado (C1)
+# Outreach message the dashboard drafts for recruiter leads (you send it yourself).
+outreach:
+  subject: "Senior ML Engineer (LLM + document AI): application"
+  body: |-
+    Hi,
+
+    I saw your post about the role and I'd like to be considered. I have 6 years in ML, the last 3 shipping LLM
+    and document-AI systems to production (e.g. 92% field-level accuracy on claims extraction, 60% lower cost
+    per document). I work remotely from Uruguay (UTC-3), with full overlap with US Eastern.
+
+    CV attached. Happy to jump on a quick call.
+
+    Best,
+    Avery Quinn

@@ -1,0 +1,133 @@
+# FICTIONAL example. Search and scoring rules for `jobbot discover` (jobbot/match.py, jobbot/screening.py).
+
+# A job title must match one of these (regex, case-insensitive)...
+title_include:
+  - "machine learning"
+  - "\\bml\\b"
+  - "\\bmlops\\b"
+  - "\\bai engineer"
+  - "\\bai/ml\\b"
+  - "applied (ai|ml)"
+  - "\\bllm\\b"
+  - "generative ai|\\bgenai\\b"
+  - "data scien"
+  - "(ai|ml) platform"
+  - "forward deployed"
+# ...and none of these.
+title_exclude:
+  - "intern\\b|internship|new grad|graduate"
+  - "\\bjunior\\b|\\bjr\\b"
+  - "manager|director|head of|\\bvp\\b|vice president"
+  - "sales|account executive|recruiter|legal|counsel|marketing (manager|specialist|lead|director|coordinator|associate|strategist|executive|analyst)"
+  - "phd"
+  - "designer|creative|artist|writer"
+  - "\\bqa\\b|quality assurance|\\btest(ing)? engineer"
+  # Role families the candidate does not do, even when the title mentions ML/AI/LLM:
+  - "data engineer|analytics engineer|\\bbi\\b|business intelligence|data analyst"
+  - "full[- ]?stack|front[- ]?end|back[- ]?end|mobile|ios|android"
+  - "devops|\\bsre\\b|site reliability|platform security|security engineer"
+  # AI gig work (annotation, tutoring, evaluation) and non-engineering "AI" titles:
+  - "trainer|tutor|annotat|labell?er|rater|evaluator|response|expert contributor|subject matter expert|freelance writer"
+  - "editor|video (producer|creator)|content (writer|creator|specialist|manager|moderator|strategist)|copywriter|\\bseo\\b|audio specialist|voice (actor|over)|translator|linguist"
+  - "\\bhr\\b|human resources|people ops|operations (owner|manager|specialist)|customer success|support (engineer|specialist)"
+  - "transformation|adoption|enablement|partner|business development|program manager|product manager|product owner"
+  - 'business analyst|\bgtm\b|go-to-market|marketing (&|and) gtm'
+  - "hardware|firmware|embedded|robotics technician|electrical|mechanical|test automation"
+  - "gerente|jefe|jefa|coordinador|coordinadora|director|directora|l[ií]der de equipo"
+
+# Seniority the candidate doesn't have (never staff/principal/lead, not a researcher).
+# A "lead" title is still accepted when the posting says it is a first leadership step (lead_ok_if).
+title_exclude_seniority:
+  - '\bstaff\b|principal|distinguished|\bfellow|\bhead\b|architect|arquitect'
+  - '\blead\b|\bleader\b|l[ií]der|tech lead|team lead'
+  - 'research|investigador|(?<!data )\bscientist\b'
+lead_ok_if: "first (leadership|lead|management) (role|position|experience|opportunity)|step(ping)? into (a |your first )?(tech |team )?lead|grow into (a )?(tech |team )?lead|aspiring (tech |team )?lead|primera experiencia (como|de) (l[ií]der|liderazgo)"
+
+# Roles the candidate targets; titles are compared to these with sentence embeddings (jobbot/semantic.py).
+target_roles:
+  - Machine Learning Engineer
+  - Senior Machine Learning Engineer
+  - AI Engineer
+  - Applied AI Engineer
+  - LLM Engineer building RAG and agent applications
+  - Generative AI Engineer
+  - Data Scientist
+  - Senior Data Scientist
+  - MLOps Engineer
+  - Machine Learning Platform Engineer
+  - NLP Engineer
+  - Computer Vision Engineer
+  - Document AI Engineer
+  - Forward Deployed AI Engineer
+  - AI Solutions Engineer
+  - Ingeniero de Machine Learning
+  - Científico de Datos
+  - Ingeniero de Inteligencia Artificial
+min_title_fit: 0.5          # titles below this similarity are dropped unless they match title_include
+cv_fit_floor: 0.35          # CV-fit similarity mapped to 0 points...
+cv_fit_span: 0.3            # ...and floor+span mapped to the full 5 points
+
+# Location: the job must be remote AND open to where the candidate works from.
+# home_region: regex for that region; postings that open the role to it pass the location/eligibility gates.
+home_region: 'urugua\w*|latam|latin america|am[eé]rica latina|south america'
+# Languages the candidate does NOT speak (a posting that requires one is dropped). Default: all but English/Spanish.
+# other_languages: 'portuguese|german|french'
+location_ok:
+  - "anywhere|worldwide|global"
+  - 'western hemisphere|w\. hemisphere'
+  - "latam|latin america|south america|americas"
+  - "uruguay|montevideo"
+location_block:
+  - "(us|u\\.s\\.|united states|usa)[- ]?(only|based)"
+  - "must (be located|reside) in the (us|united states)"
+  - "(eu|europe|uk|emea)[- ]?(only|based)"
+  - "must (be located|reside|live) in (the )?(eu|europe|uk|spain)"
+  - 'anywhere in the (u\.?s\.?a?\b|united states)|\b(us|u\.s\.|usa)[- ]remote|remote[- ,(]+(us|u\.s\.|usa|united states)\b'
+  - 'ave(nue)? of the americas'
+  - 'remote[- ]+(usa|u\.s\.a?)\b|(work|remote|flexible)[^.\n]{0,40}across the (u\.s\.|us\b|united states)|u\.s\. core business hours'
+# Remote jobs whose location is only a US/Canada/UK/India city are dropped.
+location_block_only:
+  - "united states|\\busa?\\b|\\bnyc?\\b|new york|san francisco|seattle|austin|boston|chicago|canada|toronto|vancouver|united kingdom|\\buk\\b|london|india|bangalore|singapore|japan|tokyo|australia|sydney|israel|tel aviv"
+
+# Keywords that boost the score when present in the job text (weight).
+boost:
+  llm: 3
+  "large language model": 3
+  "generative ai": 3
+  genai: 3
+  rag: 2
+  "document": 2
+  "computer vision": 2
+  ocr: 2
+  mlops: 3
+  "vertex ai": 3
+  gcp: 3
+  "google cloud": 3
+  kubeflow: 2
+  "cloud run": 2
+  terraform: 1
+  fastapi: 1
+  docker: 1
+  python: 1
+  evaluation: 2
+  "production": 1
+  contractor: 2
+  "contract": 1
+  latam: 3
+  "latin america": 3
+  uruguay: 3
+
+# Required technologies the candidate does not have (from base_cv.yaml never_claim) are penalized.
+penalty_per_missing_required: 2.5
+max_missing_required: 1          # 2+ never-used techs in the posting = not a fit, dropped
+min_score: 5                     # stored in the DB (score scale ~0-10, see match.evaluate_many)
+auto_apply_min_score: 7.5        # prepared for the batch automatically
+salary_floor_usd_year: 54000     # USD 4,500/month; jobs that publish a lower maximum are dropped
+verify_min_score: 6.5          # jobs above this go through jobbot/verifier.py
+
+# Extra job sources besides the company boards, all on by default. Turn one off with {name: false}.
+# Your own sources go in profile/local_sources.py (SOURCES = {name: fetch}); they are never committed.
+sources:
+  hn: true
+# Stacks the candidate has never used; 2+ required ones = not a fit (jobbot/screening.py).
+foreign_stack: [TypeScript, JavaScript, React, Angular, Vue, Node.js, "C#", .NET, "C++", Golang, Rust, PHP, Ruby, Kotlin, Swift]

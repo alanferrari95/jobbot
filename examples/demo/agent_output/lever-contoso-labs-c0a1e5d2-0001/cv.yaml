@@ -1,0 +1,19 @@
+# Tailored CV for this job (recorded agent output for the demo, with deliberate hallucinations).
+job_id: lever-contoso-labs-c0a1e5d2-0001
+title: "Senior AI Engineer · Document intelligence with LLMs"
+summary: >-
+  Machine learning engineer with 6 years of experience building document-AI systems. I built a claims
+  extraction service with structured outputs and cut LLM cost per document by 75% while running it on
+  Kubernetes, with LangChain orchestration and per-field evaluation against a gold set.
+experience:
+  acme: [acme-claims-extract, acme-claims-eval, acme-claims-cost, acme-rag, acme-rag-eval, acme-forecast]
+  globex: [globex-api, globex-vision, globex-churn]
+  initech: [initech-sql]
+project: [proj-eval-metrics, proj-eval-gcp]
+skills:
+  - label: AI engineering
+    items: [structured outputs, LLM evaluation, prompt engineering, LangChain]
+  - label: MLOps & cloud
+    items: ["GCP (Vertex AI, BigQuery, Cloud Run)", Docker, FastAPI, CI/CD (GitHub Actions)]
+  - label: Languages & tools
+    items: [Python, SQL, pandas, NumPy, Git]

@@ -1,0 +1,34 @@
+{
+ "jobs": [
+  {
+   "id": 5002001,
+   "title": "LLM Engineer",
+   "location": {
+    "name": "Remote (Latin America)"
+   },
+   "updated_at": "2026-10-15T12:00:00-04:00",
+   "absolute_url": "https://example.com/tailspin/jobs/5002001",
+   "content": "&lt;p&gt;Tailspin Data is a small consultancy that ships AI products for startups across the Americas.&lt;/p&gt;&lt;p&gt;Ship LLM features for our startup clients, from prototype to production.&lt;/p&gt;&lt;li&gt;Build RAG pipelines and agents in Python, with evaluation against labeled data.&lt;/li&gt;&lt;li&gt;Deploy with Docker and FastAPI; our clients run on GCP or Azure.&lt;/li&gt;&lt;li&gt;4+ years of experience in ML or software engineering; prompt engineering and LLM evaluation.&lt;/li&gt;&lt;li&gt;LangChain experience is a plus.&lt;/li&gt;&lt;p&gt;Remote from anywhere in Latin America. Contractor role, paid in USD.&lt;/p&gt;"
+  },
+  {
+   "id": 5002002,
+   "title": "Computer Vision Engineer",
+   "location": {
+    "name": "Remote (Latin America)"
+   },
+   "updated_at": "2026-10-15T12:00:00-04:00",
+   "absolute_url": "https://example.com/tailspin/jobs/5002002",
+   "content": "&lt;p&gt;Tailspin Data is a small consultancy that ships AI products for startups across the Americas.&lt;/p&gt;&lt;p&gt;Train and deploy image models for retail catalog automation.&lt;/p&gt;&lt;li&gt;PyTorch, transfer learning and image classification in production.&lt;/li&gt;&lt;li&gt;Experience serving models behind an API (FastAPI) in Docker.&lt;/li&gt;&lt;li&gt;Bonus: OCR and document AI.&lt;/li&gt;&lt;p&gt;Remote from LATAM, paid in USD.&lt;/p&gt;"
+  },
+  {
+   "id": 5002003,
+   "title": "Forward Deployed AI Engineer",
+   "location": {
+    "name": "Remote"
+   },
+   "updated_at": "2026-10-15T12:00:00-04:00",
+   "absolute_url": "https://example.com/tailspin/jobs/5002003",
+   "content": "&lt;p&gt;Tailspin Data is a small consultancy that ships AI products for startups across the Americas.&lt;/p&gt;&lt;p&gt;Work directly with our clients to turn LLM prototypes into production systems.&lt;/p&gt;&lt;li&gt;Python, LLMs, retrieval and evaluation; comfortable presenting to non-technical stakeholders.&lt;/li&gt;&lt;li&gt;Deploy and monitor what you build (Docker, CI/CD, GCP).&lt;/li&gt;&lt;p&gt;We hire candidates based anywhere in LATAM, as contractors paid in USD.&lt;/p&gt;"
+  }
+ ]
+}

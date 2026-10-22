@@ -1,0 +1,23 @@
+# Tailored CV for this job (recorded agent output for the demo). Rules: .claude/skills/tailor-cv/SKILL.md
+job_id: greenhouse-northwind-ai-4001001
+title: "Senior Machine Learning Engineer · RAG and LLM evaluation in production · GCP"
+summary: >-
+  Machine learning engineer with 6 years of experience, the last 3 shipping LLM systems to production.
+  I built a retrieval-augmented support assistant over 12,000 help-center articles, with citations and a human
+  fallback, and the evaluation behind it: a 300-ticket offline set and an LLM-as-judge rubric with 85% agreement
+  with human reviewers. I deploy with FastAPI and Docker on GCP and treat evaluation, monitoring and token cost
+  as part of the product.
+experience:
+  acme: [acme-rag, acme-rag-eval, acme-claims-eval, acme-claims-extract, acme-claims-cost, acme-forecast]
+  globex: [globex-api, globex-churn, globex-vision]
+  initech: [initech-sql]
+project: [proj-eval-metrics, proj-eval-gcp]
+skills:
+  - label: AI engineering
+    items: [RAG, LLM evaluation, LLM-as-judge, structured outputs, prompt engineering, "LLMs (OpenAI, Gemini)"]
+  - label: MLOps & cloud
+    items: ["GCP (Vertex AI, BigQuery, Cloud Run)", FastAPI, Docker, CI/CD (GitHub Actions), Terraform]
+  - label: Machine learning
+    items: [sentence embeddings, PyTorch, scikit-learn, XGBoost]
+  - label: Languages & tools
+    items: [Python, SQL, pandas, NumPy, Git]

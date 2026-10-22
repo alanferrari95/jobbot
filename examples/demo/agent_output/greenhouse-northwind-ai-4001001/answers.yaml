@@ -1,0 +1,6 @@
+# Per-job form answers (recorded agent output). Checked by the grounding gate like the CV.
+labels:
+  Why do you want to work at Northwind AI?: >-
+    Your dispatchers rely on retrieval over a large document store, which is the problem I have worked on most:
+    a RAG assistant over 12,000 help-center articles with citations and a human fallback, evaluated on 300 real
+    tickets. I'd like to own evaluation and cost the same way at Northwind, where thousands of people use the answers.

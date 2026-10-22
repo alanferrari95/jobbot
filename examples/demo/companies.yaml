@@ -1,0 +1,7 @@
+# FICTIONAL company boards for the offline demo (`jobbot demo`, `jobbot --demo ...`).
+# Their postings are in boards/<ats>/<token>.json, in the same shape as each ATS's public API.
+companies:
+  - {name: "Northwind AI", ats: greenhouse, token: northwind}
+  - {name: "Tailspin Data", ats: greenhouse, token: tailspin}
+  - {name: "Contoso Labs", ats: lever, token: contoso-labs}
+  - {name: "Fabrikam Health", ats: ashby, token: fabrikam}

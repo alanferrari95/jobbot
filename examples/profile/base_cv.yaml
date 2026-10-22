@@ -1,0 +1,110 @@
+# FICTIONAL example profile. Avery Quinn and every company below are made up.
+# Copy this folder to profile/ (git-ignored) and replace it with your own facts.
+#
+# Single source of truth for every CV. Only real facts go here.
+# Tailored CVs (applications/<id>/cv.yaml) can reorder or drop bullets by id,
+# and rewrite title/summary/skills within the rules checked by `jobbot verify` (jobbot/grounding.py).
+
+contact:
+  name: Avery Quinn
+  email: avery.quinn@example.com
+  phone: "+1 555 0142"
+  linkedin: https://www.example.com/in/avery-quinn
+  github: https://example.com/avery-quinn
+  location_line: "Montevideo, Uruguay (UTC-3)  ·  Open to remote roles (contract or full-time)"
+
+# File name of the general CV in cv/ (default: "<name> - CV").
+output_stem: "Avery Quinn - Machine Learning Engineer"
+
+title: "Senior Machine Learning Engineer · LLM applications and document AI in production · MLOps on GCP"
+
+summary: >-
+  Machine learning engineer with 6 years of experience taking models from notebook to production.
+  For the last 3 years I have built LLM and document-AI systems for insurance and retail clients:
+  retrieval-augmented assistants, structured extraction with evaluation against a labeled gold set,
+  and cost controls that keep token spend predictable. I care about what happens after the demo:
+  evaluation, monitoring, and pipelines that other teams can operate.
+
+experience:
+  - id: acme
+    company: Acme Analytics
+    role: Senior Machine Learning Engineer
+    dates: Mar 2022 – Present
+    location: Montevideo (remote)
+    blurb: Data and AI consultancy. Owned LLM and document-AI systems end to end for insurance and retail clients.
+    groups:
+      - client: Litware Insurance (insurance)
+        bullets:
+          - id: acme-claims-extract
+            text: "Built a claims-document extraction service with an LLM and structured outputs: 38 fields per claim, 92% field-level accuracy against a 500-document gold set."
+          - id: acme-claims-eval
+            text: "Designed the evaluation harness: per-field precision and recall, a regression suite that runs on every prompt change, and a release gate in CI."
+          - id: acme-claims-cost
+            text: "Cut LLM cost per document by 60% by routing simple pages to a smaller model and caching repeated templates."
+      - client: Adventure Works (retail)
+        bullets:
+          - id: acme-rag
+            text: "Shipped a retrieval-augmented support assistant over 12,000 help-center articles, with citations and a fallback to human agents when retrieval confidence is low."
+          - id: acme-rag-eval
+            text: "Built an offline evaluation set of 300 real tickets and an LLM-as-judge rubric validated against two human reviewers (85% agreement)."
+          - id: acme-forecast
+            text: "Rebuilt the weekly demand forecast with gradient boosting (XGBoost), reducing forecast error by 18% across 40 stores."
+
+  - id: globex
+    company: Globex Retail
+    role: Data Scientist
+    dates: Jan 2020 – Feb 2022
+    location: Montevideo
+    groups:
+      - bullets:
+          - id: globex-churn
+            text: "Built a churn model and the weekly scoring job behind the retention campaigns; the campaigns reached 30,000 customers per month."
+          - id: globex-vision
+            text: "Trained an image classifier (PyTorch, transfer learning) to tag product photos, replacing a manual step that took two people a full day per catalog."
+          - id: globex-api
+            text: "Served models behind a FastAPI service in Docker, with input validation and request logging."
+
+  - id: initech
+    company: Initech Labs
+    role: Junior Data Analyst
+    dates: Feb 2019 – Dec 2019
+    location: Montevideo
+    groups:
+      - bullets:
+          - id: initech-sql
+            text: "Automated weekly sales reporting in SQL and Python, freeing about 6 hours of analyst time per week."
+
+projects:
+  - id: doc-eval-kit
+    name: "doc-eval-kit: evaluation toolkit for LLM document extraction"
+    dates: 2025 – Present
+    url: https://example.com/avery-quinn/doc-eval-kit
+    bullets:
+      - id: proj-eval-metrics
+        text: "Open-source toolkit that scores LLM extraction outputs against a gold set with per-field precision and recall, and fails CI when a prompt change regresses."
+      - id: proj-eval-gcp
+        text: "Runs as a Vertex AI pipeline on GCP with results in BigQuery; infrastructure in Terraform."
+
+# Every skill the candidate has actually used. Tailored skill lines may only use items from here.
+skills:
+  - label: AI engineering
+    items: ["LLMs (OpenAI, Gemini)", RAG, structured outputs, prompt engineering, LLM evaluation, LLM-as-judge]
+  - label: Machine learning
+    items: [PyTorch, scikit-learn, XGBoost, transfer learning, forecasting, sentence embeddings]
+  - label: MLOps & cloud
+    items: ["GCP (Vertex AI, BigQuery, Cloud Run)", Docker, FastAPI, Terraform, CI/CD (GitHub Actions)]
+  - label: Languages & tools
+    items: [Python, SQL, pandas, NumPy, Git]
+
+# Technologies the candidate has NOT used. They must never appear in a CV or an answer.
+never_claim: [AWS, SageMaker, Kubernetes, K8s, MLflow, Airflow, Spark, PySpark, Scala, Java, Go, Rust, Kafka, dbt]
+
+certifications:
+  - "Example Cloud Certification: Machine Learning Engineer (2024)"
+
+education:
+  - school: Universidad de la República (Uruguay)
+    degree: BSc in Computer Engineering
+    dates: "2018"
+
+languages: "English: full professional proficiency  ·  Spanish: native"
