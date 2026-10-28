@@ -160,6 +160,8 @@ function jobRow(j) {
   a.push(`<a class="b" href="${esc(j.url)}" target="_blank" rel="noopener">Posting</a>`);
   if (j.status === 'new') a.push(`<button class="b primary" onclick="jobAct('${j.id}','pack')">Prepare</button>`);
   if (['packed', 'ready'].includes(j.status)) a.push(`<button class="b" onclick="jobAct('${j.id}','verify')">Verify</button>`);
+  if (['location_unclear', 'unverified'].includes(j.verdict) && ['new', 'packed', 'ready', 'later'].includes(j.status))
+    a.push(`<button class="b" title="You checked the posting and it is open to you" onclick="jobAct('${j.id}','ok')">OK, it fits</button>`);
   if (j.status === 'later') a.push(`<button class="b" onclick="setStatus('${j.id}','ready')">Move to ready</button>`);
   if (j.status === 'ready') a.push(`<button class="b" onclick="setStatus('${j.id}','later')">Later</button>`);
   if (j.status === 'ready') a.push(`<button class="b primary" onclick="jobAct('${j.id}','apply')">Prefill form</button>`,
@@ -190,6 +192,7 @@ async function jobAct(id, act) {
   const res = await post(`/api/jobs/${encodeURIComponent(id)}/${act}`);
   if (act === 'pack') toast('Prepared. It is queued for the agent to tailor the CV.');
   if (act === 'verify') toast(res.ok ? 'Verify: PASS' : 'Verify: FAIL (' + res.errors.length + ' errors)');
+  if (act === 'ok') toast('Marked as OKed by you: it can be prepared and opened in the batch.');
   if (act === 'apply') toast('Chrome opens with the form prefilled. Review it and submit it yourself.');
   jobs();
 }

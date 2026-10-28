@@ -55,3 +55,26 @@ def test_form_gate_accepts_plain_sponsorship_questions():
     fields = [{"label": "Are you authorized to work in the US?", "required": True,
                "options": ["Yes", "No, I will require sponsorship"]}]
     assert check(fields) == []
+
+
+def test_unverified_jobs_are_checked_again_after_a_week(monkeypatch):
+    from jobbot import db, pipeline, screening
+
+    con = db.connect()
+    for n in range(5):
+        db.upsert(con, job(company=f"Co{n}"), 8.0 - n * 0.1, [], [])
+    ids = [r["id"] for r in con.execute("SELECT id FROM jobs ORDER BY score DESC")]
+    old, recent = "2026-01-01T00:00:00+00:00", db.now()
+    for jid, verdict, at in [(ids[1], "unverified", old), (ids[2], "unverified", recent),
+                             (ids[3], "location_unclear", old), (ids[4], "verified", old)]:
+        con.execute("UPDATE jobs SET verdict = ?, verified_at = ? WHERE id = ?", (verdict, at, jid))
+    con.commit()
+    seen = []
+
+    def fake_verify_rows(rows, all_rows, deep=True, log=print):
+        seen.append([r["id"] for r in rows])
+        return {r["id"]: ("verified", ["ok"]) for r in rows}
+
+    monkeypatch.setattr(screening, "verify_rows", fake_verify_rows)
+    pipeline.verify_candidates(min_score=0, limit=40)
+    assert seen[0] == [ids[0], ids[1]]  # never screened first, then the week-old unverified one

@@ -123,7 +123,8 @@ max_missing_required: 1          # 2+ never-used techs in the posting = not a fi
 min_score: 5                     # stored in the DB (score scale ~0-10, see match.evaluate_many)
 auto_apply_min_score: 7.5        # prepared for the batch automatically
 salary_floor_usd_year: 54000     # USD 4,500/month; jobs that publish a lower maximum are dropped
-verify_min_score: 6.5          # jobs above this go through jobbot/verifier.py
+verify_min_score: 6.5            # jobs above this go through jobbot/screening.py
+reverify_after_days: 7          # 'unverified' jobs are checked again after this many days
 
 # Extra job sources besides the company boards, all on by default. Turn one off with {name: false}.
 # Your own sources go in profile/local_sources.py (SOURCES = {name: fetch}); they are never committed.

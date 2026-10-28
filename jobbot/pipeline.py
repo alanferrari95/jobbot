@@ -8,7 +8,7 @@ import importlib.util
 import json
 import re
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import yaml
 
@@ -243,14 +243,20 @@ def next_slot(con) -> str:
 # ------------------------------------------------------------------ daily
 
 def verify_candidates(min_score: float | None = None, limit: int = 40, log=print) -> dict:
-    """Run the screening layer (jobbot/screening.py) on new jobs above the threshold that weren't screened yet.
-    Network checks (company page + form scan, ~15 s each) run only for the top `limit`."""
+    """Run the screening layer (jobbot/screening.py) on new jobs above the threshold that weren't screened yet,
+    then on 'unverified' ones checked more than targets.yaml `reverify_after_days` (default 7) ago: a page that
+    errored may load now, and the weekly board discovery may have found the company page behind an aggregator link.
+    'location_unclear' is not retried (the same page gives the same answer): you OK it in the dashboard.
+    Network checks (company page + form scan, ~15 s each) run only for the top `limit`, new jobs first."""
     from . import screening
 
     con = db.connect()
-    min_score = targets().get("verify_min_score", 6.5) if min_score is None else min_score
-    rows = con.execute("SELECT * FROM jobs WHERE status IN ('new', 'packed') AND score >= ? AND verdict IS NULL "
-                       "ORDER BY score DESC", (min_score,)).fetchall()
+    tg = targets()
+    min_score = tg.get("verify_min_score", 6.5) if min_score is None else min_score
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=tg.get("reverify_after_days", 7))).isoformat(timespec="seconds")
+    rows = con.execute("SELECT * FROM jobs WHERE status IN ('new', 'packed') AND score >= ? AND (verdict IS NULL OR "
+                       "(verdict = 'unverified' AND COALESCE(verified_at, '') < ?)) "
+                       "ORDER BY verdict IS NOT NULL, score DESC", (min_score, cutoff)).fetchall()
     all_rows = con.execute("SELECT * FROM jobs").fetchall()
     res = screening.verify_rows(rows[:limit], all_rows, deep=not offline(), log=log)
     res |= screening.verify_rows(rows[limit:], all_rows, deep=False, log=log)  # text checks only; retried next run
@@ -265,12 +271,13 @@ def verify_candidates(min_score: float | None = None, limit: int = 40, log=print
 
 
 def prepare_all() -> list[str]:
-    """Pack every VERIFIED new job that fits well enough to apply (no fixed limit) and queue its CV tailoring.
+    """Pack every verified (or OKed by hand) new job that fits well enough to apply (no fixed limit) and queue its
+    CV tailoring.
     With targets.yaml `auto_draft: true`, `jobbot draft` (backend: targets.yaml `drafter`, default local) also
     writes, renders and verifies a first CV."""
     con = db.connect()
     tg = targets()
-    rows = con.execute("SELECT id FROM jobs WHERE status = 'new' AND score >= ? AND verdict = 'verified' "
+    rows = con.execute("SELECT id FROM jobs WHERE status = 'new' AND score >= ? AND verdict IN ('verified', 'ok_manual') "
                        "ORDER BY score DESC", (tg.get("auto_apply_min_score", 6),)).fetchall()
     ids = [pack(r["id"]) for r in rows]
     if tg.get("auto_draft"):
