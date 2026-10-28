@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from .config import browser_profile_dir
+from .config import base_cv_stem, browser_profile_dir, fixed_cv
 from .formscan import open_form, scan_page
 
 EEO = re.compile(r"gender|race|ethnic|veteran|disabilit|hispanic|latino|sexual|orientation|pronoun|transgender", re.I)
@@ -34,6 +34,13 @@ PERSONAL_FIELDS = [
     (r"current (company|employer)|^company$|empresa actual", "current_company"),
     (r"current (title|role|position)|cargo actual", "current_title"),
 ]
+
+
+def upload_name() -> str:
+    """The file name the recruiter sees: the fixed CV's own name, else the general CV's (`output_stem`).
+    Never the local cv.pdf, which says nothing about who sent it."""
+    fixed = fixed_cv()
+    return fixed.name if fixed else f"{base_cv_stem()}.pdf"
 
 
 def _norm(s: str) -> str:
@@ -59,10 +66,14 @@ def _words(s: str) -> list[str]:
     return re.findall(r"\w+", s.lower())
 
 
+NEGATION = {"not", "no", "don", "doesn", "never", "non"}
+
+
 def _pick(options: list[str], value) -> str | None:
     """Exact text first; then an option whose words contain all of the answer's words, or the other way round.
     Whole words only: "No" must not match "Norway", and "Montevideo, Uruguay" should match
-    "Montevideo, Montevideo Department, Uruguay"."""
+    "Montevideo, Montevideo Department, Uruguay". Both sides must agree on negation: "I am not located in the
+    EEA/UK" must not pick an option shown as "I am located"."""
     wanted = [str(v).strip().lower() for v in (value if isinstance(value, list) else [value])]
     for w in wanted:
         for o in options:
@@ -72,7 +83,7 @@ def _pick(options: list[str], value) -> str | None:
         ww = set(_words(w))
         for o in options:
             ow = set(_words(o))
-            if ww and ow and (ww <= ow or ow <= ww):
+            if ww and ow and (ww <= ow or ow <= ww) and bool(ww & NEGATION) == bool(ow & NEGATION):
                 return o
     return None
 
@@ -97,9 +108,11 @@ def _fill_one(page, f: dict, value, report: dict) -> None:
     elif typ in ("radio", "checkbox"):
         values = value if isinstance(value, list) else [value]
         for v in values:
-            opt = next((o for o in f["options"] if _pick([o["label"]], v)), None)
-            if opt is None:
+            labels = [o["label"] for o in f["options"]]
+            choice = _pick(labels, v)  # all options at once, so an exact match wins over a loose earlier one
+            if choice is None:
                 raise ValueError(f"no option matches {v!r}")
+            opt = f["options"][labels.index(choice)]
             target = page.locator(f'[data-jb="{opt["jb"]}"]')
             try:
                 target.check(force=True)
@@ -249,7 +262,7 @@ def _fill_page(page, apply_url: str, cv_pdf: Path, job_answers: dict, answers: d
     target = next((f for f in files if RESUME.search(f["label"])), files[0] if files else None)
     if target:
         page.locator(f'[data-jb="{target["id"]}"]').set_input_files(
-            {"name": f"{answers['personal'].get('full_name', 'CV')} - CV.pdf", "mimeType": "application/pdf",
+            {"name": upload_name(), "mimeType": "application/pdf",
              "buffer": cv_pdf.read_bytes()})
         report["file"] = target["label"]
         page.wait_for_timeout(3000)

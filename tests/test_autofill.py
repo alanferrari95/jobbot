@@ -22,5 +22,12 @@ def test_all_words_of_the_answer():
     assert _pick(places, "Punta del Este, Uruguay") is None
 
 
+def test_negation_must_agree():
+    # Ashby shows radio labels cut short; the first one's words are a subset of the answer, but it says the opposite.
+    gdpr = ["I am located", "I am not"]
+    assert _pick(gdpr, "I am not located in the EEA/UK") == "I am not"
+    assert _pick(gdpr, "I am located in the EEA/UK and consent") == "I am located"
+
+
 def test_list_answers_take_the_first_that_matches():
     assert _pick(["Python", "Go", "Rust"], ["Java", "python"]) == "Python"
