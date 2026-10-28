@@ -310,6 +310,11 @@ def evaluate_many(jobs: list[Job], tg: dict, base: dict) -> list[tuple[bool, flo
             reasons.append("matches: " + ", ".join(hits[:10]))
         if missing:
             reasons.append("asks for: " + ", ".join(missing))
+        # Preferences outside the capped keyword boost: each matching group adds its bonus once.
+        for name, p in (tg.get("prefer") or {}).items():
+            if re.search(p["pattern"], text, re.I):
+                score += p["bonus"]
+                reasons.append(f"preferred: {name} (+{p['bonus']})")
         top = salary_usd_year(j)
         if top is not None:
             reasons.append(f"pays up to ~USD {top:,.0f}/year (~{top / 12:,.0f}/month)")
