@@ -77,6 +77,15 @@ def base_cv_stem(base: dict | None = None) -> str:
     return base.get("output_stem") or f"{base['contact']['name']} - CV"
 
 
+def fixed_cv(tg: dict | None = None) -> Path | None:
+    """targets.yaml `cv: fixed`: the one PDF sent to every job, never tailored (`fixed_cv:`, relative to the data
+    folder; default: the general CV that `jobbot render base` writes). None when CVs are tailored per job."""
+    tg = targets() if tg is None else tg
+    if tg.get("cv", "tailored") != "fixed":
+        return None
+    return home() / tg["fixed_cv"] if tg.get("fixed_cv") else cv_out_dir() / f"{base_cv_stem()}.pdf"
+
+
 def companies() -> list[dict]:
     """Hand-picked boards plus the ones found by `jobbot discover-boards` (offline: the demo's recorded boards)."""
     if offline():

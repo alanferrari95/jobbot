@@ -7,13 +7,14 @@ import concurrent.futures as cf
 import importlib.util
 import json
 import re
+import shutil
 import sys
 from datetime import datetime, timedelta, timezone
 
 import yaml
 
 from . import db
-from .config import answers, app_dir, apps_dir, base_cv, companies, load_yaml, offline, profile_dir, targets
+from .config import answers, app_dir, apps_dir, base_cv, companies, fixed_cv, load_yaml, offline, profile_dir, targets
 from .cv import render, resolve
 from .grounding import report_md, verify
 from .match import TITLE_BROAD, evaluate_many
@@ -118,18 +119,37 @@ def spec_template(base: dict, job_id: str) -> str:
 
 
 def pack(job_id: str) -> str:
+    """Write the job's folder. Tailored CVs: queue the tailoring (the job is ready once its CV passes the gate).
+    Fixed CV (targets.yaml `cv: fixed`): nothing is written or queued per job, so the job is ready right away."""
     con = db.connect()
     r = db.get(con, job_id)
     d = app_dir(r["id"])
     d.mkdir(parents=True, exist_ok=True)
     (d / "job.md").write_text(job_md(r), encoding="utf-8")
+    (d / "people.md").write_text(people_md(r["company"]), encoding="utf-8")
+    if fixed_cv():
+        if r["status"] in ("new", "packed"):
+            db.set_status(con, r["id"], "ready")
+        con.execute("UPDATE tasks SET status = 'cancelled', note = 'fixed CV', updated = ? "
+                    "WHERE kind = 'tailor' AND ref = ? AND status = 'pending'", (db.now(), r["id"]))
+        con.commit()
+        return r["id"]
     if not (d / "cv.yaml").exists():
         (d / "cv.yaml").write_text(spec_template(base_cv(), r["id"]), encoding="utf-8")
-    (d / "people.md").write_text(people_md(r["company"]), encoding="utf-8")
     if r["status"] == "new":
         db.set_status(con, r["id"], "packed")
     db.enqueue(con, "tailor", r["id"])
     return r["id"]
+
+
+def cv_to_send(job_id: str):
+    """The PDF to upload. With a fixed CV it is copied into the job's folder first, so cv.pdf there is always
+    exactly what was sent."""
+    d = app_dir(job_id)
+    if (src := fixed_cv()):
+        d.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, d / "cv.pdf")
+    return d / "cv.pdf"
 
 
 def render_job(job_id: str):
@@ -143,6 +163,13 @@ def verify_job(job_id: str) -> dict:
     con = db.connect()
     r = db.get(con, job_id)
     d = app_dir(r["id"])
+    if (src := fixed_cv()):  # nothing was written for this job: only check that the CV to send exists
+        errors = [] if src.exists() else [f"fixed CV not found: {src} (run `jobbot render base` or fix targets.yaml)"]
+        result = {"ok": not errors, "errors": errors, "warnings": ["fixed CV: not tailored for this job"],
+                  "keywords": {}}
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "verify.md").write_text(report_md(r["id"], result), encoding="utf-8")
+        return result
     result = verify(d, base_cv(), r["description"], answers())
     (d / "verify.md").write_text(report_md(r["id"], result), encoding="utf-8")
     (d / "verify.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
@@ -274,13 +301,21 @@ def prepare_all() -> list[str]:
     """Pack every verified (or OKed by hand) new job that fits well enough to apply (no fixed limit) and queue its
     CV tailoring.
     With targets.yaml `auto_draft: true`, `jobbot draft` (backend: targets.yaml `drafter`, default local) also
-    writes, renders and verifies a first CV."""
+    writes, renders and verifies a first CV.
+    With `cv: fixed` there is no tailoring: jobs go straight to ready, including ones packed before the switch, and
+    tailoring tasks still pending are cancelled."""
     con = db.connect()
     tg = targets()
-    rows = con.execute("SELECT id FROM jobs WHERE status = 'new' AND score >= ? AND verdict IN ('verified', 'ok_manual') "
-                       "ORDER BY score DESC", (tg.get("auto_apply_min_score", 6),)).fetchall()
+    statuses = ("new", "packed") if fixed_cv(tg) else ("new",)
+    if fixed_cv(tg):
+        con.execute("UPDATE tasks SET status = 'cancelled', note = 'fixed CV', updated = ? "
+                    "WHERE kind = 'tailor' AND status = 'pending'", (db.now(),))
+        con.commit()
+    rows = con.execute(f"SELECT id FROM jobs WHERE status IN ({','.join('?' * len(statuses))}) AND score >= ? "
+                       "AND verdict IN ('verified', 'ok_manual') ORDER BY score DESC",
+                       (*statuses, tg.get("auto_apply_min_score", 6))).fetchall()
     ids = [pack(r["id"]) for r in rows]
-    if tg.get("auto_draft"):
+    if tg.get("auto_draft") and not fixed_cv(tg):
         from .drafter import draft
         for jid in ids:
             try:
@@ -315,7 +350,7 @@ def ready_items() -> list[dict]:
                          "ORDER BY score DESC"):
         d = app_dir(r["id"])
         cover = (d / "cover_letter.md").read_text(encoding="utf-8") if (d / "cover_letter.md").exists() else None
-        items.append({"id": r["id"], "url": r["apply_url"], "cv_pdf": str(d / "cv.pdf"),
+        items.append({"id": r["id"], "url": r["apply_url"], "cv_pdf": str(cv_to_send(r["id"])),
                       "job_answers": job_answers(r["id"]), "cover": cover})
     return items
 

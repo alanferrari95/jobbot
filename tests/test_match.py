@@ -141,3 +141,12 @@ def test_score_ranks_a_fitting_posting_above_a_weak_one(tg, base):
     (keep_s, score_s, reasons, _), (_, score_w, _, _) = evaluate_many([strong, weak], tg, base)
     assert score_s > score_w
     assert any(r.startswith("CV fit") for r in reasons) and "pays in USD" in reasons
+
+
+def test_salary_adds_to_the_score_by_tier(tg, base):
+    text = "Build RAG systems in Python on GCP. Salary: USD {} - {} per year."
+    posts = [job(description=text.format(lo, hi), external_id=str(hi)) for lo, hi in
+             [(55000, 60000), (70000, 75000), (85000, 90000)]]
+    tiers = dict(tg, salary_floor_usd_year=50000, salary_target_usd_year=72000, salary_ideal_usd_year=84000)
+    low, mid, high = (s for _, s, _, _ in evaluate_many(posts, tiers, base))
+    assert round(mid - low, 2) == 0.5 and round(high - mid, 2) == 0.5

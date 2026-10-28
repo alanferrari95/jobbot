@@ -118,6 +118,10 @@ jobbot --demo web           # dashboard on http://127.0.0.1:8766 with the demo d
 4. `jobbot verify <id>`, then `jobbot apply <id>`: Chrome opens with the form filled in; review and submit.
 5. Optional: `jobbot daily` twice a day ([Windows and cron instructions](docs/scheduling.md)) and `jobbot web`.
 
+**One CV for every job**: `cv: fixed` in `targets.yaml` turns tailoring off. Verified jobs go straight to ready, nothing
+is queued or written per job, and every application uploads the same PDF (`fixed_cv:`, default: the one
+`jobbot render base` writes). Form questions come from your `answers.yaml`; the rest are left for you.
+
 **Tailoring without an agent session**: `jobbot draft <id>` writes the tailoring spec, renders it and runs the gate.
 Pick what runs it:
 

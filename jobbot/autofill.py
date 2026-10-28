@@ -177,7 +177,8 @@ def _fill_getonboard(page, apply_url: str, cv_pdf: Path, job_answers: dict, answ
 
     # The CV is the one saved in your Get on Board profile (the general one); uploading another opens a modal.
     report["file"] = "CV from your Get on Board profile (general)"
-    salary = next((v for k, v in labels.items() if "sueldo" in k or "salary" in k), None)
+    salary = (next((v for k, v in labels.items() if "sueldo" in k or "salary" in k), None)
+              or (answers.get("salary") or {}).get("ask_usd_month"))
     if salary and page.locator("input[name='job_application[expected_salary]']").count():
         page.locator("input[name='job_application[expected_salary]']").fill(str(salary))
         report["filled"].append(f"Salary: USD {salary}/month")

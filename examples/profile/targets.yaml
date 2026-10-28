@@ -123,8 +123,15 @@ max_missing_required: 1          # 2+ never-used techs in the posting = not a fi
 min_score: 5                     # stored in the DB (score scale ~0-10, see match.evaluate_many)
 auto_apply_min_score: 7.5        # prepared for the batch automatically
 salary_floor_usd_year: 54000     # USD 4,500/month; jobs that publish a lower maximum are dropped
+salary_target_usd_year: 66000    # a published maximum from here adds 0.5 to the score...
+salary_ideal_usd_year: 80000     # ...and from here, 1
 verify_min_score: 6.5            # jobs above this go through jobbot/screening.py
 reverify_after_days: 7          # 'unverified' jobs are checked again after this many days
+
+# CVs: `tailored` (default) queues a per-job CV for the agent or `jobbot draft`, checked by the gate.
+# `fixed` sends the same PDF to every job and writes nothing per job: verified jobs go straight to ready.
+cv: tailored
+# fixed_cv: cv/Avery Quinn - Machine Learning Engineer.pdf   # relative to the data folder; default: `jobbot render base`
 
 # Extra job sources besides the company boards, all on by default. Turn one off with {name: false}.
 # Your own sources go in profile/local_sources.py (SOURCES = {name: fetch}); they are never committed.

@@ -39,7 +39,7 @@ from pathlib import Path
 import yaml
 
 from . import db, pipeline
-from .config import REPO, answers, app_dir, base_cv, base_cv_stem, browser_profile_dir, cv_out_dir, profile_dir
+from .config import REPO, answers, app_dir, base_cv, base_cv_stem, browser_profile_dir, cv_out_dir, fixed_cv, profile_dir
 from .cv import render, resolve
 from .grounding import report_md
 from .people import people_md
@@ -135,7 +135,7 @@ def cmd_apply(args) -> None:
         raise SystemExit("Verify failed: fix the errors above before applying.")
     d = app_dir(r["id"])
     cover = (d / "cover_letter.md").read_text(encoding="utf-8") if (d / "cover_letter.md").exists() else None
-    report = run(r["apply_url"], d / "cv.pdf", answers(), cover, job_answers=pipeline.job_answers(r["id"]),
+    report = run(r["apply_url"], pipeline.cv_to_send(r["id"]), answers(), cover, job_answers=pipeline.job_answers(r["id"]),
                  interactive=not args.from_web)
     (d / "autofill.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     if report.get("submitted"):
@@ -145,7 +145,9 @@ def cmd_apply(args) -> None:
 
 def cmd_prepare_all(args) -> None:
     ids = pipeline.prepare_all()
-    print(f"Prepared {len(ids)} jobs. Tailoring is queued for the agent (`jobbot tasks`).")
+    then = ("They are ready to open (`jobbot apply-batch`), all with the same CV." if fixed_cv()
+            else "Tailoring is queued for the agent (`jobbot tasks`).")
+    print(f"Prepared {len(ids)} jobs. {then}")
 
 
 def cmd_apply_batch(args) -> None:
