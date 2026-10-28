@@ -113,6 +113,16 @@ def job_pack(job_id: str):
     return {"id": pipeline.pack(job_id)}
 
 
+@app.post("/api/jobs/{job_id}/ok")
+def job_ok(job_id: str):
+    """You checked a job the screening layer couldn't confirm (location unclear, company page not found) and it fits."""
+    con = db.connect()
+    con.execute("UPDATE jobs SET verdict = 'ok_manual', verdict_reasons = 'OKed by you in the dashboard', verified_at = ? "
+                "WHERE id = ?", (db.now(), job_id))
+    con.commit()
+    return {"ok": True}
+
+
 @app.post("/api/jobs/{job_id}/verify")
 def job_verify(job_id: str):
     pipeline.render_job(job_id)

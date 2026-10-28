@@ -55,17 +55,35 @@ def answer_for(label: str, job_answers: dict, answers: dict, cover: str | None):
     return None
 
 
+def _words(s: str) -> list[str]:
+    return re.findall(r"\w+", s.lower())
+
+
 def _pick(options: list[str], value) -> str | None:
+    """Exact text first; then an option whose words contain all of the answer's words, or the other way round.
+    Whole words only: "No" must not match "Norway", and "Montevideo, Uruguay" should match
+    "Montevideo, Montevideo Department, Uruguay"."""
     wanted = [str(v).strip().lower() for v in (value if isinstance(value, list) else [value])]
     for w in wanted:
         for o in options:
             if o.strip().lower() == w:
                 return o
     for w in wanted:
+        ww = set(_words(w))
         for o in options:
-            if w and (w in o.lower() or o.lower() in w):
+            ow = set(_words(o))
+            if ww and ow and (ww <= ow or ow <= ww):
                 return o
     return None
+
+
+def _menu_options(page, el):
+    """The options of THIS combobox's open menu. Greenhouse also keeps the phone field's country list
+    ("Afghanistan+93", ...) as [role=option] in the page, so a page-wide query picked countries for every question."""
+    for attr in ("aria-controls", "aria-owns"):
+        if (lid := el.get_attribute(attr)):
+            return page.locator(f'[id="{lid}"] [role=option]')
+    return page.locator("[role=listbox]:visible [role=option]")
 
 
 def _fill_one(page, f: dict, value, report: dict) -> None:
@@ -91,10 +109,11 @@ def _fill_one(page, f: dict, value, report: dict) -> None:
         el.click()
         el.fill(str(value))
         page.wait_for_timeout(1500)
-        options = page.locator("[role=option]")
+        options = _menu_options(page, el)
         texts = [options.nth(k).inner_text().strip() for k in range(min(options.count(), 15))]
         choice = _pick(texts, value)
         if choice is None:
+            el.press("Escape")  # an open menu covers the next fields and their clicks time out
             raise ValueError(f"no option matches {value!r} (saw: {texts[:5]})")
         options.nth(texts.index(choice)).click()
     else:

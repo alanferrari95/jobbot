@@ -168,8 +168,10 @@ PAY_USD = re.compile(r"(paid|pago|payment|salary|salario|compensation|cobr\w+|fa
                      re.I)
 TEXT_RANGE = re.compile(
     r"(?:usd|us\$|u\$s|\$)\s?(\d[\d.,]*)\s?(k)?\s*(?:usd)?\s*(?:-|–|—|to|a|hasta)\s*(?:usd|us\$|u\$s|\$)?\s?(\d[\d.,]*)\s?(k)?\s*"
-    r"(?:usd)?\s*(?:/|per|por|al|a|an|each|every)\s?(month|mes|mo\b|monthly|year|a[nñ]o|yr|annum|annual|hour|hora|hr|h\b)",
+    r"(?:usd)?(?:\s*(?:/|per|por|al|a|an|each|every)\s?(month|mes|mo\b|monthly|year|a[nñ]o|yr|annum|annual|hour|hora|hr|h\b))?",
     re.I)
+PAY_WORD = re.compile(r"salar|pay\b|compensation|base|sueldo|remuneraci", re.I)
+OTHER_CURRENCY = re.compile(r"\s*\(?(cad|can|aud|nzd|eur|gbp|chf|sgd|mxn|brl)\b", re.I)
 
 
 def _num(s: str, k: str | None) -> float:
@@ -186,11 +188,17 @@ def _num(s: str, k: str | None) -> float:
 
 
 def text_salary_max_usd_year(text: str) -> float | None:
-    """Highest USD range written in the posting text ("USD 2,500 - 3,000 / month"), annualized."""
+    """Highest USD range written in the posting text ("USD 2,500 - 3,000 / month"), annualized.
+    A range with no period ("base salary of $200,000 - $250,000 USD") counts only when it is clearly an annual salary:
+    a pay word right before it, five digits or more, and no other currency after it ("deals between $250K-$2M",
+    "$140K-$180K CAN" don't count)."""
     best = None
     for m in TEXT_RANGE.finditer(text):
         hi = max(_num(m.group(1), m.group(2)), _num(m.group(3), m.group(4)))
-        unit = m.group(5).lower()
+        unit = (m.group(5) or "").lower()
+        if not unit and (hi < 20000 or not PAY_WORD.search(text[max(0, m.start() - 80):m.start()])
+                         or OTHER_CURRENCY.match(text, m.end())):
+            continue
         year = hi * 2000 if unit.startswith(("h", "hora")) else hi * 12 if unit.startswith(("m", "mes")) else hi
         if 5000 <= year <= 400000:
             best = max(best or 0, year)
@@ -250,8 +258,13 @@ def _stage1(job: Job, tg: dict, never_claim: list[str]) -> tuple[bool, list[str]
 
 
 def salary_usd_year(job: Job) -> float | None:
-    """Structured salary when the source has it, else a USD range written in the posting text."""
-    return salary_max_usd_year(job) or text_salary_max_usd_year(job.description)
+    """Structured salary when the source has it, else a USD range written in the posting text.
+    When both exist and the feed's number is well above the text (an aggregator listed 220-300k for a posting that says
+    $130,000-$160,000), the employer's own words win."""
+    structured, written = salary_max_usd_year(job), text_salary_max_usd_year(job.description)
+    if structured and written and structured > 1.3 * written:
+        return written
+    return structured or written
 
 
 def _clamp(x: float) -> float:

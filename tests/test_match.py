@@ -86,6 +86,27 @@ def test_salary_from_text_and_structured_data():
     assert salary_usd_year(gob) == 48000
 
 
+def test_annual_range_without_a_period():
+    assert text_salary_max_usd_year("The pay range is base salary of $200,000 –$250,000 USD.") == 250000
+    assert text_salary_max_usd_year("Salary Range: $130K–$200K, depending on experience") == 200000
+    assert text_salary_max_usd_year("Series A: raised $5 - $10 to build it") is None  # too small to be a salary
+    assert text_salary_max_usd_year("You will close deals between $250K-$2M+.") is None  # not pay
+    assert text_salary_max_usd_year("Competitive salary ($140K-$180K CAN) and stock") is None  # not USD
+
+
+def test_posting_text_beats_an_inflated_feed():
+    text = "The national pay range for this full-time position is base salary of $130,000 –$160,000 USD."
+    inflated = job(source="himalayas", description=text,
+                   extra={"salary": [220000, 300000], "salary_period": "annual", "currency": "USD"})
+    assert salary_usd_year(inflated) == 160000
+    close = job(source="himalayas", description=text,
+                extra={"salary": [140000, 170000], "salary_period": "annual", "currency": "USD"})
+    assert salary_usd_year(close) == 170000  # within 30%: the structured field stands
+    out_of_range = job(source="himalayas", description="",
+                       extra={"salary": [300000, 700000], "salary_period": "annual", "currency": "USD"})
+    assert salary_usd_year(out_of_range) is None
+
+
 def test_missing_required_ignores_alternatives_and_nice_to_haves():
     never = ["AWS", "Kubernetes", "Spark"]
     assert missing_required("Hands-on experience with Kubernetes and AWS SageMaker.", never) == ["AWS", "Kubernetes"]

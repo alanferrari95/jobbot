@@ -52,6 +52,9 @@ def test_dashboard_api(demo_home):
     detail = client.get("/api/jobs/greenhouse-northwind-ai-4001001").json()
     assert detail["files"]["cv.pdf"] and "**Result: PASS**" in detail["verify"]
     assert client.get("/files/greenhouse-northwind-ai-4001001/cv.pdf").headers["content-type"] == "application/pdf"
+    assert client.post("/api/jobs/ashby-fabrikam-health-f4b1-0004/ok").json() == {"ok": True}
+    jobs = client.get("/api/jobs", params={"status": "ready"}).json()
+    assert {j["id"]: j["verdict"] for j in jobs}["ashby-fabrikam-health-f4b1-0004"] == "ok_manual"
 
 
 def test_example_profile_is_complete():
