@@ -92,7 +92,7 @@ const LABEL = { new: 'new', packed: 'to tailor', ready: 'ready', applied: 'appli
 const VERDICT = { verified: '✅ verified', location_unclear: '❔ location unclear', unverified: '⚠️ unverified',
   discarded: '❌ discarded', ok_manual: '✅ OKed by you' };
 
-let tab = 'home', jobFilter = 'new', jobQuery = '';
+let tab = 'home', jobFilter = 'new', jobQuery = '', fixedCv = false;
 $('#nav').onclick = e => { const b = e.target.closest('button'); if (!b) return;
   tab = b.dataset.tab; document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x === b)); render(); };
 
@@ -101,6 +101,7 @@ async function render() { $('#main').innerHTML = '<p class="meta">Loading…</p>
 // ---------------------------------------------------------------- home
 async function home() {
   const s = await api('/api/summary');
+  fixedCv = s.fixed_cv;
   const tasks = (await api('/api/tasks')).filter(t => t.status === 'pending');
   const j = s.jobs, p = s.posts;
   $('#main').innerHTML = `
@@ -117,7 +118,9 @@ async function home() {
         <button class="b" id="prep">Prepare all (${j.new || 0} new)</button>
         <button class="b primary" id="batch" ${(j.ready || 0) ? '' : 'disabled'}>Open all ready applications (${j.ready || 0})</button>
       </div>
-      <p class="meta">1) "Prepare all" packs every verified job that fits and queues it for the agent. 2) Ask Claude Code to process the queue (it tailors the CVs and writes the answers; the grounding gate checks them).
+      <p class="meta">${fixedCv
+        ? '1) "Prepare all" moves every verified job that fits to ready. 2) Every application gets the same CV (targets.yaml <code>cv: fixed</code>) and your standard answers.'
+        : '1) "Prepare all" packs every verified job that fits and queues it for the agent. 2) Ask Claude Code to process the queue (it tailors the CVs and writes the answers; the grounding gate checks them).'}
       3) "Open all ready applications" opens Chrome with one prefilled tab per application: review it, solve the CAPTCHA if there is one, click Submit yourself and close the tab. 4) Mark it "applied" in Applications.</p>
     </section>
     <section class="card">
@@ -131,7 +134,7 @@ async function home() {
       <div class="row"><button class="b" onclick="go('posts')">Go to Posts</button></div></section>` : ''}
     <section class="card">
       <h2>Queue for the agent (${tasks.length})</h2>
-      ${tasks.length ? `<p class="hint">Open Claude Code in this project and ask it to <b>process the queue</b>. It tailors the CVs and drafts the posts; you review them here.</p>
+      ${tasks.length ? `<p class="hint">Open Claude Code in this project and ask it to <b>process the queue</b>. ${fixedCv ? 'It drafts the posts' : 'It tailors the CVs and drafts the posts'}; you review them here.</p>
         ${tasks.map(t => `<div class="meta">• ${esc(t.what)}</div>`).join('')}` : '<p class="meta">Nothing pending.</p>'}
     </section>
     ${s.needs_confirm.length ? `<section class="card"><h2>Answers to confirm</h2>
@@ -183,14 +186,14 @@ async function jobDetail(el, id) {
   const d = await api('/api/jobs/' + encodeURIComponent(id));
   el.querySelector('div').innerHTML = `
     <p class="meta">${esc(d.reasons)}</p>
-    ${d.files['cv.pdf'] ? `<p><a href="/files/${encodeURIComponent(id)}/cv.pdf" target="_blank">Open tailored CV (PDF)</a></p>` : '<p class="meta">No tailored CV yet.</p>'}
+    ${d.files['cv.pdf'] ? `<p><a href="/files/${encodeURIComponent(id)}/cv.pdf" target="_blank">Open this job's CV (PDF)</a></p>` : '<p class="meta">No CV in the job folder yet.</p>'}
     ${d.verify ? `<pre>${esc(d.verify)}</pre>` : ''}
     ${d.people ? `<details><summary>People to follow at ${esc(d.company)}</summary><pre>${esc(d.people)}</pre></details>` : ''}
     <details><summary>Full description</summary><pre>${esc(d.description)}</pre></details>`;
 }
 async function jobAct(id, act) {
   const res = await post(`/api/jobs/${encodeURIComponent(id)}/${act}`);
-  if (act === 'pack') toast('Prepared. It is queued for the agent to tailor the CV.');
+  if (act === 'pack') toast(fixedCv ? 'Ready: it goes out with your CV.' : 'Prepared. It is queued for the agent to tailor the CV.');
   if (act === 'verify') toast(res.ok ? 'Verify: PASS' : 'Verify: FAIL (' + res.errors.length + ' errors)');
   if (act === 'ok') toast('Marked as OKed by you: it can be prepared and opened in the batch.');
   if (act === 'apply') toast('Chrome opens with the form prefilled. Review it and submit it yourself.');
@@ -207,7 +210,7 @@ async function applied() {
   const row = j => `<div class="job"><div class="score">${Math.round(j.score)}</div>
     <div><b>${esc(j.company)}</b> · ${esc(j.title)} <span class="badge ${j.status}">${LABEL[j.status]}</span>
       <div class="meta">${esc(j.location)} · ${j.applied_at ? 'applied ' + fmt(j.applied_at) : esc(j.note || 'ready to send')}</div>
-      <div class="meta"><a href="${esc(j.url)}" target="_blank" rel="noopener">posting</a> · <a href="/files/${encodeURIComponent(j.id)}/cv.pdf" target="_blank">${j.status === 'ready' ? 'tailored CV' : 'CV sent'}</a></div></div>
+      <div class="meta"><a href="${esc(j.url)}" target="_blank" rel="noopener">posting</a> · <a href="/files/${encodeURIComponent(j.id)}/cv.pdf" target="_blank">${j.status === 'ready' ? 'CV' : 'CV sent'}</a></div></div>
     <div class="actions">${j.status === 'ready' ? `<button class="b primary" onclick="setStatus2('${j.id}','applied')">Mark applied</button>` :
       ['interview', 'offer', 'rejected'].map(s => `<button class="b" onclick="setStatus2('${j.id}','${s}')">${LABEL[s]}</button>`).join('')}</div></div>`;
   $('#main').innerHTML = `

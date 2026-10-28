@@ -313,7 +313,9 @@ def evaluate_many(jobs: list[Job], tg: dict, base: dict) -> list[tuple[bool, flo
         top = salary_usd_year(j)
         if top is not None:
             reasons.append(f"pays up to ~USD {top:,.0f}/year (~{top / 12:,.0f}/month)")
-            score += 1 if top >= 80000 else 0.5
+            # Above the floor: +1 from salary_ideal_usd_year, +0.5 from salary_target_usd_year (default: any).
+            score += 1 if top >= tg.get("salary_ideal_usd_year", 80000) else (
+                0.5 if top >= tg.get("salary_target_usd_year", 0) else 0)
         _, pay_notes, pay_adj = gates(j, tg)
         reasons += pay_notes
         score += pay_adj

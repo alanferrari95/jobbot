@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
 from . import db, leads, pipeline
-from .config import REPO, app_dir, base_cv_stem, cv_out_dir, profile_dir
+from .config import REPO, app_dir, base_cv_stem, cv_out_dir, fixed_cv, profile_dir
 
 STATIC = Path(__file__).parent / "static"
 app = FastAPI(title="jobbot")
@@ -46,7 +46,8 @@ def summary():
     confirm = [q["match"] for q in yaml.safe_load((profile_dir() / "answers.yaml").read_text(encoding="utf-8"))["questions"]
                if q.get("confirm")]
     return {"jobs": counts, "posts": posts, "due_posts": due, "pending_tasks": tasks,
-            "last_run": dict(last) if last else None, "running": _run["running"], "needs_confirm": confirm}
+            "last_run": dict(last) if last else None, "running": _run["running"], "needs_confirm": confirm,
+            "fixed_cv": bool(fixed_cv())}
 
 
 @app.post("/api/run/daily")
@@ -125,7 +126,8 @@ def job_ok(job_id: str):
 
 @app.post("/api/jobs/{job_id}/verify")
 def job_verify(job_id: str):
-    pipeline.render_job(job_id)
+    if not fixed_cv():
+        pipeline.render_job(job_id)
     return pipeline.verify_job(job_id)
 
 

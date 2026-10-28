@@ -27,7 +27,7 @@ import requests
 import yaml
 
 from . import db, semantic
-from .config import answers, app_dir, base_cv, targets
+from .config import answers, app_dir, base_cv, fixed_cv, targets
 from .grounding import check_spec, profile_text
 
 HEADER = "# Drafted by jobbot draft ({backend}). Rules: .claude/skills/tailor-cv/SKILL.md\n"
@@ -178,6 +178,8 @@ def draft(job_id: str, backend: str | None = None, force: bool = False, log=prin
     Returns (job id, verify result, a note on how it was drafted). Never overwrites a spec someone edited."""
     from .pipeline import render_job, verify_job
 
+    if fixed_cv():
+        raise SystemExit("targets.yaml has `cv: fixed`: every job gets the same CV, nothing to draft.")
     name = backend_name(backend)
     r = db.get(db.connect(), job_id)
     base = base_cv()

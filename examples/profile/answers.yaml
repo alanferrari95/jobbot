@@ -45,6 +45,7 @@ questions:
 salary:
   minimum_usd_year: 54000
   target_usd_year: 72000
+  ask_usd_month: 6000    # Get on Board's salary field when the job has no answers of its own
 # Get on Board step 1 (only if you apply through getonbrd.com). HTML, as the site's editor expects.
 getonboard:
   experience_html: "<div>- Senior Machine Learning Engineer, Acme Analytics (2022 – Present). LLM document extraction
