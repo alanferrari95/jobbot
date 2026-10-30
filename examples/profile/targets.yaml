@@ -70,6 +70,11 @@ cv_fit_span: 0.3            # ...and floor+span mapped to the full 5 points
 # Location: the job must be remote AND open to where the candidate works from.
 # home_region: regex for that region; postings that open the role to it pass the location/eligibility gates.
 home_region: 'urugua\w*|latam|latin america|am[eé]rica latina|south america'
+# LinkedIn post searches shown on the dashboard's Leads tab (you open them; nothing is scraped).
+# Quotes, OR, NOT and parentheses work. Leave it out to use the generic searches in jobbot/leads.py.
+post_searches:
+  - 'hiring "machine learning engineer" remote (LATAM OR Uruguay)'
+  - 'hiring "data scientist" remote (LATAM OR "South America")'
 # Languages the candidate does NOT speak (a posting that requires one is dropped). Default: all but English/Spanish.
 # other_languages: 'portuguese|german|french'
 location_ok:
