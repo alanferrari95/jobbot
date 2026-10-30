@@ -119,12 +119,20 @@ def _fill_one(page, f: dict, value, report: dict) -> None:
             except Exception:
                 target.click(force=True)
     elif typ == "combobox":
+        # Read the open menu before typing: the menu filters by substring, so a stored answer worded unlike the
+        # options ("Full professional proficiency." vs "Full Professional Proficiency: Fluent and...") empties it.
         el.click()
-        el.fill(str(value))
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(800)
         options = _menu_options(page, el)
-        texts = [options.nth(k).inner_text().strip() for k in range(min(options.count(), 15))]
+        texts = [t.strip() for t in options.all_inner_texts()[:400]]
         choice = _pick(texts, value)
+        if choice is None:  # long or async lists (cities, schools) only load matches once you type
+            first = value[0] if isinstance(value, list) else value
+            el.fill(re.sub(r"[.\s]+$", "", str(first)))
+            page.wait_for_timeout(1500)
+            options = _menu_options(page, el)
+            texts = [t.strip() for t in options.all_inner_texts()[:50]]
+            choice = _pick(texts, value)
         if choice is None:
             el.press("Escape")  # an open menu covers the next fields and their clicks time out
             raise ValueError(f"no option matches {value!r} (saw: {texts[:5]})")

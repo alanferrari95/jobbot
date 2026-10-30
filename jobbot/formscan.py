@@ -47,6 +47,8 @@ SCAN_JS = r"""
     let type = tag === 'SELECT' ? 'select' : tag === 'TEXTAREA' ? 'textarea' : (el.getAttribute('role') === 'combobox' && tag !== 'INPUT') ? 'combobox' : (el.type || 'text');
     if (tag === 'INPUT' && el.getAttribute('role') === 'combobox') type = 'combobox';
     if (['hidden', 'submit', 'button', 'image', 'reset', 'search'].includes(type) || !visible(el)) return;
+    // Greenhouse puts an aria-hidden, untabbable "required" proxy next to each dropdown; the dropdown is the field.
+    if (tag === 'INPUT' && el.getAttribute('aria-hidden') === 'true' && el.tabIndex < 0) return;
     el.dataset.jb = el.dataset.jb || ('f' + (i++));
     const required = el.required || el.getAttribute('aria-required') === 'true';
     if (type === 'radio' || type === 'checkbox') {
