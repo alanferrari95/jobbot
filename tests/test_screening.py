@@ -36,6 +36,14 @@ def test_gig_platform_and_short_posting(base):
         ["posting has no description (closed or broken)"]
 
 
+def test_junior_role_but_not_one_skill_in_a_senior_posting(base):
+    junior = LONG + " Requirements: 1+ years of experience with Python."
+    assert text_checks(job(description=junior), targets(), base["never_claim"]) == ["junior role"]
+    rag = LONG + " 5+ years of experience with production NLP. At least 1+ year of experience with RAG."
+    assert text_checks(job(description=rag), targets(), base["never_claim"]) == []
+    assert text_checks(job(title="Senior ML Engineer", description=junior), targets(), base["never_claim"]) == []
+
+
 def test_duplicates_across_sources():
     row = {"id": "a", "company": "Northwind, Inc.", "title": "Senior ML Engineer - Remote", "status": "new"}
     other = {"id": "b", "company": "northwind.ai", "title": "Senior ML Engineer", "status": "applied"}

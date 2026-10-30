@@ -58,6 +58,9 @@ ROLE = {
     "junior role": re.compile(r"\b(0|1)\+? ?(-|to) ?[12]? ?years? of experience\b|\b1\+ years? of experience|basic understanding "
                               r"of machine learning|entry[- ]level", re.I),
 }
+# "1+ year with RAG" next to "5+ years of experience" is one skill in a senior posting, not a junior role.
+SENIOR_YEARS = re.compile(r"\b([3-9]|1\d)\+? ?((-|to) ?\d+ ?)?years", re.I)
+SENIOR_TITLE = re.compile(r"\b(senior|sr)\b", re.I)
 NOCODE = re.compile(r"\bn8n\b|zapier|make\.com|go high level|low-code|no-code", re.I)
 GIG_COMPANIES = ["micro1", "evb", "mindrift", "outlier", "alignerr", "dataannotation", "remotasks", "scale ai"]
 REMOTE_TIED = re.compile(
@@ -110,7 +113,8 @@ def text_checks(job: Job, tg: dict, never_claim: list[str]) -> list[str]:
     if job.company.strip().lower() in {c.lower() for c in tg.get("gig_companies", GIG_COMPANIES)}:
         return ["gig/task platform"]
     for why, rx in ROLE.items():
-        if rx.search(text):
+        if rx.search(text) and not (why == "junior role"
+                                    and (SENIOR_TITLE.search(job.title) or SENIOR_YEARS.search(text))):
             return [why]
     if len(set(m.lower() for m in NOCODE.findall(text))) >= 2:
         return ["no-code automation role"]
