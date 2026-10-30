@@ -38,9 +38,13 @@ MAX_WORDS = 170
 
 
 def linkedin_post_searches() -> list[dict]:
-    """Search URLs you open yourself (newest posts first)."""
+    """Search URLs you open yourself (last week's posts, newest first). Queries come from targets.yaml
+    `post_searches` when set, else the generic ones above; LinkedIn takes quotes, OR, NOT and parentheses."""
+    from .config import targets
+
+    queries = targets().get("post_searches") or POST_SEARCHES
     return [{"q": q, "url": "https://www.linkedin.com/search/results/content/?keywords="
-             + quote(q) + "&sortBy=%22date_posted%22"} for q in POST_SEARCHES]
+             + quote(q) + "&datePosted=%22past-week%22&sortBy=%22date_posted%22"} for q in queries]
 
 
 def extract(text: str) -> dict:
