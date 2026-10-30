@@ -107,6 +107,13 @@ def open_to_us(region: str) -> re.Pattern:
                       rf"({region})[- ]based|remote[- ]({region})", re.I)
 REMOTE_WORDS = re.compile(r"remote|remoto|telecommute|full[- ]?time|part[- ]?time|async|contract|_?local|unspecified|"
                           r"[\s,/|:;·()-]+", re.I)
+# Boards often put only the region in the location ("Latin America") and say "Fully remote" in the text.
+REMOTE_TEXT = re.compile(r"(fully|100%|entirely|completely|totally)[ -]remote|remote[- ](first|role|position|job|team)|"
+                         r"work(ing)? remotely|work from (home|anywhere)|(role|position|job) is remote|"
+                         r"\(remote\)|\b(mode|modality|work model|workplace type)\W{0,3}remote|"
+                         r"100% remoto|trabajo remoto|modalidad remota", re.I)
+NOT_REMOTE_TEXT = re.compile(r"\bhybrid\b(?! of)|h[ií]brid[oa]|presencial|office and remote|on[- ]?site (role|position|job)|"
+                             r"in[- ]office \d|\d days? (a|per) week (in|at) (the|our) office", re.I)
 
 
 def location_status(job: Job, targets: dict) -> tuple[str, str]:
@@ -114,7 +121,9 @@ def location_status(job: Job, targets: dict) -> tuple[str, str]:
     loc = job.location or ""
     head = job.description[:2500]
     remote = job.remote or re.search(r"remote|remoto|telecommute", loc, re.I) or (
-        job.source == "hn" and "remote" in job.title.lower())
+        job.source == "hn" and "remote" in job.title.lower()) or (
+        _any(targets["location_ok"], loc) and REMOTE_TEXT.search(job.description)
+        and not NOT_REMOTE_TEXT.search(job.description))
     if not remote:
         return "no", "not remote"
     if _any(targets["location_block"], loc + "\n" + head):

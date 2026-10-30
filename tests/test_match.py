@@ -47,6 +47,22 @@ def test_onsite_is_not_remote(tg):
     assert location_status(job(location="Berlin, Germany", remote=False), tg) == ("no", "not remote")
 
 
+@pytest.mark.parametrize("location, description, expected", [
+    ("Latin America", "Fully remote | Complete engagement job", "ok"),
+    ("Latin America", "USA Contractor / 100% Remote", "ok"),
+    ("LatAm, North Macedonia, Portugal, Serbia", "We work entirely remotely.", "ok"),
+    ("Uruguay", "Trabajo remoto desde cualquier departamento.", "ok"),
+    ("Latin America", "Location LATAM (Remote) Mode Remote", "ok"),
+    ("LATAM", "A hybrid of engineer and scientist, in a fully remote team.", "ok"),
+    ("Buenos Aires", "Hybrid: remote-first team, 2 days in the office.", "no"),
+    ("Uruguay", "Office and remote work balance. A structured remote onboarding.", "no"),
+    ("Latin America", "A great team.", "no"),
+    ("Berlin, Germany", "Fully remote.", "no"),
+])
+def test_remote_stated_only_in_text(tg, location, description, expected):
+    assert location_status(job(location=location, description=description, remote=False), tg)[0] == expected
+
+
 def test_home_region_is_configurable(tg):
     posting = job(location="Remote", description="Candidates based in Uruguay are welcome.")
     assert location_status(posting, tg)[0] == "ok"
